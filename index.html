@@ -22,7 +22,6 @@
       --border: #2d3e4e;
       --card-bg: #1e2a3a;
       --btn-bg: #2d3e4e;
-      --input-bg: #2a3a4a;
     }
     body.light {
       --bg: #f5f7fa;
@@ -32,7 +31,6 @@
       --border: #ccd7e4;
       --card-bg: #ffffff;
       --btn-bg: #e9edf2;
-      --input-bg: #f9f9f9;
     }
 
     body {
@@ -84,31 +82,6 @@
       padding: 16px;
       margin: 20px 0;
       text-align: center;
-    }
-    .sponsor-edit {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 12px;
-      justify-content: center;
-    }
-    .sponsor-edit input, .map-edit input {
-      padding: 8px 16px;
-      border-radius: 40px;
-      border: 1px solid var(--border);
-      background: var(--input-bg);
-      color: var(--text);
-      flex: 1;
-      min-width: 200px;
-    }
-    button {
-      background-color: var(--btn-bg);
-      border: none;
-      padding: 8px 20px;
-      border-radius: 40px;
-      color: var(--text);
-      cursor: pointer;
-      font-weight: 500;
     }
     .sponsor-content {
       display: flex;
@@ -227,29 +200,6 @@
       border-color: var(--border);
       margin: 12px 0;
     }
-    .settings-section {
-      background: var(--surface);
-      border-radius: 24px;
-      padding: 20px;
-      margin: 20px 0;
-      border: 1px solid var(--border);
-    }
-    .settings-section h3 {
-      margin-bottom: 12px;
-      font-size: 1.2rem;
-    }
-    .map-edit {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin: 16px 0;
-      align-items: center;
-    }
-    .note {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      margin-top: 8px;
-    }
     @media (max-width: 640px) {
       body { padding: 0 12px; }
       .card { width: 100%; }
@@ -269,28 +219,7 @@
     </div>
   </header>
 
-  <!-- スポンサー上部 + 地図設定（統合設定エリア） -->
-  <div class="settings-section">
-    <h3>🖼️ Sponsor Settings</h3>
-    <div class="sponsor-edit">
-      <input type="text" id="sponsorImgUrl" placeholder="画像URL (jpg/png)" value="">
-      <input type="text" id="sponsorSiteUrl" placeholder="公式サイトURL" value="">
-      <button id="saveSponsor">💾 Save Sponsor</button>
-    </div>
-    <div class="note">※ 画像URLとリンク先URLを入力して保存すると、上下のスポンサー枠に反映されます。</div>
-    
-    <h3 style="margin-top: 24px;">🗺️ Map URLs for Main Islands</h3>
-    <div class="map-edit">
-      <input type="text" id="ishigakiMapUrl" placeholder="石垣島の地図URL (iframe src)">
-      <button id="saveIshigakiMap">Save Ishigaki Map</button>
-    </div>
-    <div class="map-edit">
-      <input type="text" id="miyakoMapUrl" placeholder="宮古島の地図URL (iframe src)">
-      <button id="saveMiyakoMap">Save Miyako Map</button>
-    </div>
-    <div class="note">💡 地図URLの例: Googleマップで「共有」→「埋め込み地図」を選び、src="..." の部分をコピー。またはOpenStreetMapの静的画像URLなど。</div>
-  </div>
-
+  <!-- スポンサー上部（コード内の変数SPONSOR_IMG_URL, SPONSOR_SITE_URLで内容を変更できます） -->
   <div class="sponsor-area" id="sponsorTop">
     <div class="sponsor-content" id="sponsorContentTop">
       <span id="sponsorTextTop">✨ Sponsor space ✨</span>
@@ -299,6 +228,7 @@
 
   <main id="app"></main>
 
+  <!-- スポンサー下部 -->
   <div class="sponsor-area" id="sponsorBottom">
     <div class="sponsor-content" id="sponsorContentBottom">
       <span>✨ Sponsor space ✨</span>
@@ -310,6 +240,24 @@
   </footer>
 
   <script>
+    // ============================================================
+    // ★ 設定エリア（ここを編集してスポンサーと地図URLを変更してください）
+    // ============================================================
+    
+    // スポンサー画像のURL（空文字にすると非表示）
+    const SPONSOR_IMG_URL = "";   // 例: "https://example.com/sponsor.png"
+    // スポンサーリンク先のURL
+    const SPONSOR_SITE_URL = "";  // 例: "https://example.com"
+    
+    // 石垣島の地図埋め込みURL（iframeのsrcに指定するURL）
+    // Googleマップの「共有」→「地図を埋め込む」で取得したsrcの値をコピー
+    const ISHIGAKI_MAP_URL = "";  // 例: "https://www.google.com/maps/embed?pb=..."
+    
+    // 宮古島の地図埋め込みURL
+    const MIYAKO_MAP_URL = "";     // 例: "https://www.google.com/maps/embed?pb=..."
+    
+    // ============================================================
+    
     // ---------- 多言語データ ----------
     const translations = {
       en: {
@@ -319,7 +267,7 @@
         sponsorDefault: "✨ Sponsor space ✨",
         officialWebsite: "Official Website",
         detailsButton: "View Details →",
-        noMap: "🗺️ Map URL not set. Please configure above.",
+        noMap: "🗺️ Map URL not set. Please edit the code to add a map.",
         mapLabel: "Map"
       },
       it: {
@@ -329,7 +277,7 @@
         sponsorDefault: "✨ Spazio Sponsor ✨",
         officialWebsite: "Sito Ufficiale",
         detailsButton: "Vedi Dettagli →",
-        noMap: "🗺️ Mappa non configurata. Imposta sopra.",
+        noMap: "🗺️ Mappa non configurata. Modifica il codice per aggiungere una mappa.",
         mapLabel: "Mappa"
       },
       ru: {
@@ -339,7 +287,7 @@
         sponsorDefault: "✨ Место для спонсора ✨",
         officialWebsite: "Официальный сайт",
         detailsButton: "Подробнее →",
-        noMap: "🗺️ URL карты не задан. Настройте выше.",
+        noMap: "🗺️ URL карты не задан. Отредактируйте код.",
         mapLabel: "Карта"
       },
       ja: {
@@ -349,7 +297,7 @@
         sponsorDefault: "✨ スポンサー枠 ✨",
         officialWebsite: "公式サイト",
         detailsButton: "詳細を見る →",
-        noMap: "🗺️ 地図URLが未設定です。上で設定してください。",
+        noMap: "🗺️ 地図URLが未設定です。コードを編集して追加してください。",
         mapLabel: "地図"
       }
     };
@@ -366,8 +314,7 @@
         sights: { en: "Kabira Bay, Mt. Nosoko, Ishigaki Yaima Village", ja: "川平湾、野底岳、石垣やいま村", it: "Baia Kabira, Monte Nosoko, Villaggio Yaima", ru: "Бухта Кабира, гора Носоко, деревня Яима" },
         tips: { en: "Rent a car for flexibility. Try Yaeyama soba.", ja: "レンタカーが便利。八重山そばを試して。", it: "Noleggia un'auto. Prova gli Yaeyama soba.", ru: "Арендуйте машину. Попробуйте лапшу Яэяма." },
         official: "https://visitokinawa.jp/",
-        group: "yaeyama",
-        mapKey: "ishigakiMap"
+        group: "yaeyama"
       },
       miyakoMain: {
         id: "miyakoMain",
@@ -378,8 +325,7 @@
         sights: { en: "Yonaha Maehama Beach, Cape Higashi-Hennazaki, Ikema Bridge", ja: "与那覇前浜ビーチ、東平安名崎、池間大橋", it: "Spiaggia Yonaha Maehama, Capo Higashi-Hennazaki", ru: "Пляж Ёнаха Маэхама, мыс Хигаси-Хэннадзаки" },
         tips: { en: "Best for snorkeling and stargazing.", ja: "シュノーケリングと星空観測に最適。", it: "Ottimo per snorkeling e osservazione stelle.", ru: "Отлично для снорклинга и звёзд." },
         official: "https://www.miyakotravel.jp/",
-        group: "miyako",
-        mapKey: "miyakoMap"
+        group: "miyako"
       }
     };
 
@@ -448,10 +394,6 @@
     let currentDetailId = null;
     let deferredPrompt;
 
-    // 地図URL保存用
-    let ishigakiMapUrl = localStorage.getItem("ishigakiMapUrl") || "";
-    let miyakoMapUrl = localStorage.getItem("miyakoMapUrl") || "";
-
     function render() {
       const app = document.getElementById("app");
       if (currentView === "main") {
@@ -463,7 +405,7 @@
               <img class="main-island-img" src="${mainIslandsDetails.ishigaki.image}" alt="Ishigaki" onerror="this.src='https://placehold.co/600x300?text=Ishigaki'">
               <p>${getName(mainIslandsDetails.ishigaki.description, "Gateway to Yaeyama islands.")}</p>
               <div class="map-preview">
-                ${ishigakiMapUrl ? `<iframe src="${ishigakiMapUrl}" title="Ishigaki Map" allowfullscreen loading="lazy"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}
+                ${ISHIGAKI_MAP_URL ? `<iframe src="${ISHIGAKI_MAP_URL}" title="Ishigaki Map" allowfullscreen loading="lazy"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}
               </div>
               <a href="${mainIslandsDetails.ishigaki.official}" target="_blank" class="official-btn" onclick="event.stopPropagation()">${t("officialWebsite")}</a>
               <div style="margin-top:12px"><button class="detail-btn">${t("detailsButton")}</button></div>
@@ -473,7 +415,7 @@
               <img class="main-island-img" src="${mainIslandsDetails.miyakoMain.image}" alt="Miyako" onerror="this.src='https://placehold.co/600x300?text=Miyako'">
               <p>${getName(mainIslandsDetails.miyakoMain.description, "Coral paradise.")}</p>
               <div class="map-preview">
-                ${miyakoMapUrl ? `<iframe src="${miyakoMapUrl}" title="Miyako Map" allowfullscreen loading="lazy"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}
+                ${MIYAKO_MAP_URL ? `<iframe src="${MIYAKO_MAP_URL}" title="Miyako Map" allowfullscreen loading="lazy"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}
               </div>
               <a href="${mainIslandsDetails.miyakoMain.official}" target="_blank" class="official-btn" onclick="event.stopPropagation()">${t("officialWebsite")}</a>
               <div style="margin-top:12px"><button class="detail-btn">${t("detailsButton")}</button></div>
@@ -561,54 +503,27 @@
       document.getElementById("main-title").innerText = t("title");
     }
 
-    // スポンサー関連
+    // スポンサー表示（コード上部で設定した変数を使用）
     function updateSponsorDisplay() {
-      const imgUrl = localStorage.getItem("sponsorImg") || "";
-      const siteUrl = localStorage.getItem("sponsorUrl") || "";
-      const htmlTop = imgUrl ? `<img class="sponsor-img" src="${imgUrl}" alt="sponsor"><br><a class="sponsor-link" href="${siteUrl}" target="_blank" rel="noopener">${siteUrl}</a>` : `<span>${t("sponsorDefault")}<br><small>Set image & URL above</small></span>`;
-      const htmlBottom = imgUrl ? `<img class="sponsor-img" src="${imgUrl}" alt="sponsor"><br><a class="sponsor-link" href="${siteUrl}" target="_blank" rel="noopener">Visit Sponsor</a>` : `<span>${t("sponsorDefault")}</span>`;
+      const hasSponsor = SPONSOR_IMG_URL && SPONSOR_SITE_URL;
+      const htmlTop = hasSponsor 
+        ? `<img class="sponsor-img" src="${SPONSOR_IMG_URL}" alt="sponsor"><br><a class="sponsor-link" href="${SPONSOR_SITE_URL}" target="_blank" rel="noopener">${SPONSOR_SITE_URL}</a>` 
+        : `<span>${t("sponsorDefault")}<br><small>Edit SPONSOR_IMG_URL and SPONSOR_SITE_URL in the code</small></span>`;
+      const htmlBottom = hasSponsor 
+        ? `<img class="sponsor-img" src="${SPONSOR_IMG_URL}" alt="sponsor"><br><a class="sponsor-link" href="${SPONSOR_SITE_URL}" target="_blank" rel="noopener">Visit Sponsor</a>` 
+        : `<span>${t("sponsorDefault")}</span>`;
       document.getElementById("sponsorContentTop").innerHTML = htmlTop;
       document.getElementById("sponsorContentBottom").innerHTML = htmlBottom;
     }
-    
-    document.getElementById("saveSponsor")?.addEventListener("click", () => {
-      localStorage.setItem("sponsorImg", document.getElementById("sponsorImgUrl").value);
-      localStorage.setItem("sponsorUrl", document.getElementById("sponsorSiteUrl").value);
-      updateSponsorDisplay();
-    });
-    
-    // 地図URL保存
-    document.getElementById("saveIshigakiMap")?.addEventListener("click", () => {
-      const url = document.getElementById("ishigakiMapUrl").value;
-      localStorage.setItem("ishigakiMapUrl", url);
-      ishigakiMapUrl = url;
-      if (currentView === "main") render();
-    });
-    document.getElementById("saveMiyakoMap")?.addEventListener("click", () => {
-      const url = document.getElementById("miyakoMapUrl").value;
-      localStorage.setItem("miyakoMapUrl", url);
-      miyakoMapUrl = url;
-      if (currentView === "main") render();
-    });
-    
-    function loadSettingsFromStorage() {
-      document.getElementById("sponsorImgUrl").value = localStorage.getItem("sponsorImg") || "";
-      document.getElementById("sponsorSiteUrl").value = localStorage.getItem("sponsorUrl") || "";
-      document.getElementById("ishigakiMapUrl").value = localStorage.getItem("ishigakiMapUrl") || "";
-      document.getElementById("miyakoMapUrl").value = localStorage.getItem("miyakoMapUrl") || "";
-      ishigakiMapUrl = localStorage.getItem("ishigakiMapUrl") || "";
-      miyakoMapUrl = localStorage.getItem("miyakoMapUrl") || "";
-      updateSponsorDisplay();
-    }
 
-    // 言語
+    // 言語切り替え
     function setLang(lang) { currentLang = lang; render(); }
     document.getElementById("langEN")?.addEventListener("click", () => setLang("en"));
     document.getElementById("langIT")?.addEventListener("click", () => setLang("it"));
     document.getElementById("langRU")?.addEventListener("click", () => setLang("ru"));
     document.getElementById("langJA")?.addEventListener("click", () => setLang("ja"));
 
-    // テーマ
+    // テーマ切り替え
     const body = document.body;
     const themeToggle = document.getElementById("themeToggle");
     if (localStorage.getItem("theme") === "light") { body.classList.remove("dark"); body.classList.add("light"); }
@@ -646,7 +561,6 @@
       });
     }
 
-    loadSettingsFromStorage();
     render();
   </script>
 </body>
