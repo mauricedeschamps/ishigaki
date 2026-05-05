@@ -7,14 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e2a3a">
   <!-- Google Maps API (キーを設定してください) -->
-  <script>
-    // APIキーが設定されていない場合のフォールバックメッセージ
-    window.GOOGLE_MAPS_API_KEY = 'YOUR_API_KEY'; // ここに実際のキーを入れてください
-    if (window.GOOGLE_MAPS_API_KEY === 'YOUR_API_KEY') {
-      console.warn('⚠️ Google Maps API key is not set. Please replace YOUR_API_KEY in index.html');
-    }
-  </script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=onGoogleMapsLoaded" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
   <style>
     * {
       margin: 0;
@@ -238,6 +231,7 @@
     </div>
   </header>
 
+  <!-- スポンサー上部 -->
   <div class="sponsor-area" id="sponsorTop">
     <div class="sponsor-content" id="sponsorContentTop">
       <span id="sponsorTextTop">✨ Sponsor space ✨</span>
@@ -251,6 +245,7 @@
 
   <main id="app"></main>
 
+  <!-- スポンサー下部 -->
   <div class="sponsor-area" id="sponsorBottom">
     <div class="sponsor-content" id="sponsorContentBottom">
       <span>✨ Sponsor space ✨</span>
@@ -264,30 +259,116 @@
   <script>
     // ---------- 多言語データ ----------
     const translations = {
-      en: { title: "🌊 Yaeyama & Miyako Islands", mainPageTitle: "Main Islands", backToMain: "← Back to Main", sponsorDefault: "✨ Sponsor space ✨", officialWebsite: "Official Website", detailsButton: "View Details →" },
-      it: { title: "🌊 Isole Yaeyama e Miyako", mainPageTitle: "Isole Principali", backToMain: "← Torna alla Home", sponsorDefault: "✨ Spazio Sponsor ✨", officialWebsite: "Sito Ufficiale", detailsButton: "Vedi Dettagli →" },
-      ru: { title: "🌊 Острова Яэяма и Мияко", mainPageTitle: "Главные острова", backToMain: "← На главную", sponsorDefault: "✨ Место для спонсора ✨", officialWebsite: "Официальный сайт", detailsButton: "Подробнее →" },
-      ja: { title: "🌊 八重山・宮古諸島ガイド", mainPageTitle: "メイン島", backToMain: "← メインページへ戻る", sponsorDefault: "✨ スポンサー枠 ✨", officialWebsite: "公式サイト", detailsButton: "詳細を見る →" }
+      en: {
+        title: "🌊 Yaeyama & Miyako Islands",
+        mainPageTitle: "Main Islands",
+        backToMain: "← Back to Main",
+        sponsorDefault: "✨ Sponsor space ✨",
+        officialWebsite: "Official Website",
+        detailsButton: "View Details →"
+      },
+      it: {
+        title: "🌊 Isole Yaeyama e Miyako",
+        mainPageTitle: "Isole Principali",
+        backToMain: "← Torna alla Home",
+        sponsorDefault: "✨ Spazio Sponsor ✨",
+        officialWebsite: "Sito Ufficiale",
+        detailsButton: "Vedi Dettagli →"
+      },
+      ru: {
+        title: "🌊 Острова Яэяма и Мияко",
+        mainPageTitle: "Главные острова",
+        backToMain: "← На главную",
+        sponsorDefault: "✨ Место для спонсора ✨",
+        officialWebsite: "Официальный сайт",
+        detailsButton: "Подробнее →"
+      },
+      ja: {
+        title: "🌊 八重山・宮古諸島ガイド",
+        mainPageTitle: "メイン島",
+        backToMain: "← メインページへ戻る",
+        sponsorDefault: "✨ スポンサー枠 ✨",
+        officialWebsite: "公式サイト",
+        detailsButton: "詳細を見る →"
+      }
     };
     let currentLang = "en";
 
-    // 島データ (前回と同じ)
+    // ---------- 島データ ----------
     const mainIslandsDetails = {
-      ishigaki: { id: "ishigaki", name: { en: "Ishigaki Island", it: "Ishigaki", ru: "Исигаки", ja: "石垣島" }, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Ishigaki_island_NASA.jpg/640px-Ishigaki_island_NASA.jpg", description: { en: "Gateway to Yaeyama, beautiful beaches and lush mountains.", ja: "八重山の玄関口、美しいビーチと緑豊かな山々。", it: "Porta d'ingresso alle Yaeyama, spiagge e montagne verdi.", ru: "Ворота на Яэяму, пляжи и зелёные горы." }, access: { en: "Direct flights from Tokyo, Osaka, Nagoya; ferry to nearby islands.", ja: "東京・大阪・名古屋から直行便；周辺島へのフェリー。", it: "Voli diretti; traghetti per isole vicine.", ru: "Прямые рейсы; паромы к соседним островам." }, sights: { en: "Kabira Bay, Mt. Nosoko, Ishigaki Yaima Village", ja: "川平湾、野底岳、石垣やいま村", it: "Baia Kabira, Monte Nosoko, Villaggio Yaima", ru: "Бухта Кабира, гора Носоко, деревня Яима" }, tips: { en: "Rent a car for flexibility. Try Yaeyama soba.", ja: "レンタカーが便利。八重山そばを試して。", it: "Noleggia un'auto. Prova gli Yaeyama soba.", ru: "Арендуйте машину. Попробуйте лапшу Яэяма." }, official: "https://visitokinawa.jp/", group: "yaeyama" },
-      miyakoMain: { id: "miyakoMain", name: { en: "Miyako Island", it: "Miyako", ru: "Мияко", ja: "宮古島" }, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Miyakojima_Island_NASA.jpg/640px-Miyakojima_Island_NASA.jpg", description: { en: "Coral reef paradise with translucent waters.", ja: "サンゴ礁の楽園、透き通る海。", it: "Paradiso della barriera corallina.", ru: "Рай с коралловыми рифами и прозрачной водой." }, access: { en: "Direct flights from major Japanese cities; bridges to nearby islands.", ja: "主要都市から直行便；橋で周辺島へ。", it: "Voli diretti; ponti verso isole vicine.", ru: "Прямые рейсы; мосты к соседним островам." }, sights: { en: "Yonaha Maehama Beach, Cape Higashi-Hennazaki, Ikema Bridge", ja: "与那覇前浜ビーチ、東平安名崎、池間大橋", it: "Spiaggia Yonaha Maehama, Capo Higashi-Hennazaki", ru: "Пляж Ёнаха Маэхама, мыс Хигаси-Хэннадзаки" }, tips: { en: "Best for snorkeling and stargazing.", ja: "シュノーケリングと星空観測に最適。", it: "Ottimo per snorkeling e osservazione stelle.", ru: "Отлично для снорклинга и звёзд." }, official: "https://www.miyakotravel.jp/", group: "miyako" }
+      ishigaki: {
+        id: "ishigaki",
+        name: { en: "Ishigaki Island", it: "Ishigaki", ru: "Исигаки", ja: "石垣島" },
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Ishigaki_island_NASA.jpg/640px-Ishigaki_island_NASA.jpg",
+        description: { en: "Gateway to Yaeyama, beautiful beaches and lush mountains.", ja: "八重山の玄関口、美しいビーチと緑豊かな山々。", it: "Porta d'ingresso alle Yaeyama, spiagge e montagne verdi.", ru: "Ворота на Яэяму, пляжи и зелёные горы." },
+        access: { en: "Direct flights from Tokyo, Osaka, Nagoya; ferry to nearby islands.", ja: "東京・大阪・名古屋から直行便；周辺島へのフェリー。", it: "Voli diretti; traghetti per isole vicine.", ru: "Прямые рейсы; паромы к соседним островам." },
+        sights: { en: "Kabira Bay, Mt. Nosoko, Ishigaki Yaima Village", ja: "川平湾、野底岳、石垣やいま村", it: "Baia Kabira, Monte Nosoko, Villaggio Yaima", ru: "Бухта Кабира, гора Носоко, деревня Яима" },
+        tips: { en: "Rent a car for flexibility. Try Yaeyama soba.", ja: "レンタカーが便利。八重山そばを試して。", it: "Noleggia un'auto. Prova gli Yaeyama soba.", ru: "Арендуйте машину. Попробуйте лапшу Яэяма." },
+        official: "https://visitokinawa.jp/",
+        group: "yaeyama"
+      },
+      miyakoMain: {
+        id: "miyakoMain",
+        name: { en: "Miyako Island", it: "Miyako", ru: "Мияко", ja: "宮古島" },
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Miyakojima_Island_NASA.jpg/640px-Miyakojima_Island_NASA.jpg",
+        description: { en: "Coral reef paradise with translucent waters.", ja: "サンゴ礁の楽園、透き通る海。", it: "Paradiso della barriera corallina.", ru: "Рай с коралловыми рифами и прозрачной водой." },
+        access: { en: "Direct flights from major Japanese cities; bridges to nearby islands.", ja: "主要都市から直行便；橋で周辺島へ。", it: "Voli diretti; ponti verso isole vicine.", ru: "Прямые рейсы; мосты к соседним островам." },
+        sights: { en: "Yonaha Maehama Beach, Cape Higashi-Hennazaki, Ikema Bridge", ja: "与那覇前浜ビーチ、東平安名崎、池間大橋", it: "Spiaggia Yonaha Maehama, Capo Higashi-Hennazaki", ru: "Пляж Ёнаха Маэхама, мыс Хигаси-Хэннадзаки" },
+        tips: { en: "Best for snorkeling and stargazing.", ja: "シュノーケリングと星空観測に最適。", it: "Ottimo per snorkeling e osservazione stelle.", ru: "Отлично для снорклинга и звёзд." },
+        official: "https://www.miyakotravel.jp/",
+        group: "miyako"
+      }
     };
 
     const islandsData = {
-      yaeyama: { name: { en: "Nearby Islands of Ishigaki (Yaeyama)", it: "Isole vicine a Ishigaki (Yaeyama)", ru: "Ближайшие острова Исигаки (Яэяма)", ja: "石垣島周辺の島々（八重山）" }, subIslands: [ { id: "iriomote", nameEn: "Iriomote", nameJa: "西表島", nameIt: "Iriomote", nameRu: "Ириомоте" }, { id: "taketomi", nameEn: "Taketomi", nameJa: "竹富島", nameIt: "Taketomi", nameRu: "Такетоми" }, { id: "kohama", nameEn: "Kohama", nameJa: "小浜島", nameIt: "Kohama", nameRu: "Кохама" }, { id: "kuro", nameEn: "Kuro", nameJa: "黒島", nameIt: "Kuro", nameRu: "Куро" }, { id: "hatoma", nameEn: "Hatoma", nameJa: "鳩間島", nameIt: "Hatoma", nameRu: "Хатома" } ] },
-      miyako: { name: { en: "Nearby Islands of Miyako", it: "Isole vicine a Miyako", ru: "Ближайшие острова Мияко", ja: "宮古島周辺の島々" }, subIslands: [ { id: "irrabu", nameEn: "Irabu", nameJa: "伊良部島", nameIt: "Irabu", nameRu: "Ирабу" }, { id: "shimoji", nameEn: "Shimoji", nameJa: "下地島", nameIt: "Shimoji", nameRu: "Симодзи" }, { id: "ikema", nameEn: "Ikema", nameJa: "池間島", nameIt: "Ikema", nameRu: "Икэма" }, { id: "kurima", nameEn: "Kurima", nameJa: "来間島", nameIt: "Kurima", nameRu: "Курима" } ] }
+      yaeyama: {
+        name: { en: "Nearby Islands of Ishigaki (Yaeyama)", it: "Isole vicine a Ishigaki (Yaeyama)", ru: "Ближайшие острова Исигаки (Яэяма)", ja: "石垣島周辺の島々（八重山）" },
+        subIslands: [
+          { id: "iriomote", nameEn: "Iriomote", nameJa: "西表島", nameIt: "Iriomote", nameRu: "Ириомоте" },
+          { id: "taketomi", nameEn: "Taketomi", nameJa: "竹富島", nameIt: "Taketomi", nameRu: "Такетоми" },
+          { id: "kohama", nameEn: "Kohama", nameJa: "小浜島", nameIt: "Kohama", nameRu: "Кохама" },
+          { id: "kuro", nameEn: "Kuro", nameJa: "黒島", nameIt: "Kuro", nameRu: "Куро" },
+          { id: "hatoma", nameEn: "Hatoma", nameJa: "鳩間島", nameIt: "Hatoma", nameRu: "Хатома" }
+        ]
+      },
+      miyako: {
+        name: { en: "Nearby Islands of Miyako", it: "Isole vicine a Miyako", ru: "Ближайшие острова Мияко", ja: "宮古島周辺の島々" },
+        subIslands: [
+          { id: "irrabu", nameEn: "Irabu", nameJa: "伊良部島", nameIt: "Irabu", nameRu: "Ирабу" },
+          { id: "shimoji", nameEn: "Shimoji", nameJa: "下地島", nameIt: "Shimoji", nameRu: "Симодзи" },
+          { id: "ikema", nameEn: "Ikema", nameJa: "池間島", nameIt: "Ikema", nameRu: "Икэма" },
+          { id: "kurima", nameEn: "Kurima", nameJa: "来間島", nameIt: "Kurima", nameRu: "Курима" }
+        ]
+      }
     };
 
     const detailsContent = {
       ishigaki: mainIslandsDetails.ishigaki,
       miyakoMain: mainIslandsDetails.miyakoMain,
-      iriomote: { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Iriomote_Island_View.jpg/640px-Iriomote_Island_View.jpg", description: { en: "Lush jungle, Iriomote wild cat, kayaking.", ja: "マングローブのカヤック、西表山猫で有名。", it: "Giungla lussureggiante, gatto selvatico di Iriomote.", ru: "Пышные джунгли, дикая кошка Ириомоте." }, access: { en: "30 min high-speed boat from Ishigaki port.", ja: "石垣港から高速船で30分。", it: "30 min di traghetto da Ishigaki.", ru: "30 минут на катере от Исигаки." }, sights: { en: "Pinaisara Falls, Hoshizuna Beach", ja: "ピナイサーラの滝、星砂の浜", it: "Cascate Pinaisara, Spiaggia di Hoshizuna", ru: "Водопад Пинайсара, Пляж Хосидзуна" }, tips: { en: "Bring insect repellent. Best season: spring/autumn.", ja: "虫除け必須。春・秋がおすすめ。", it: "Porta repellente. Primavera/autunno migliori.", ru: "Берите репеллент. Лучше весной/осенью." }, official: "https://visitokinawa.jp/" },
-      taketomi: { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Taketomi_Island_buffalo_cart.jpg/640px-Taketomi_Island_buffalo_cart.jpg", description: { en: "Traditional Ryukyu village, water buffalo carts.", ja: "水牛車と赤瓦の集落。", it: "Villaggio tradizionale Ryukyu, carri trainati da bufali.", ru: "Традиционная деревня Рюкю, повозки с буйволами." }, access: { en: "10-15 min ferry from Ishigaki.", ja: "石垣港からフェリーで10〜15分。", it: "Traghetto 10-15 min da Ishigaki.", ru: "10-15 мин на пароме от Исигаки." }, sights: { en: "Kondoi Beach, Star Sand", ja: "コンドイビーチ、星砂", it: "Spiaggia Kondoi, Sabbia a stella", ru: "Пляж Кондой, Звездный песок" }, tips: { en: "Rent a bike to explore.", ja: "レンタル自転車が便利。", it: "Noleggia una bici.", ru: "Арендуйте велосипед." }, official: "https://www.taketomi-island.jp/" },
-      kohama: { image: "https://upload.wikimedia.org/wikipedia/commons/1/1f/Kohama_Island_01.jpg", description: { en: "Relaxed island, sugarcane fields.", ja: "のどかな島、サトウキビ畑。", it: "Isola tranquilla, campi di canna da zucchero.", ru: "Спокойный остров, поля сахарного тростника." }, access: { en: "25 min ferry from Ishigaki.", ja: "石垣港から25分。", it: "25 min di traghetto.", ru: "25 минут паромом." }, sights: { en: "Sugar Road, Ufudachii", ja: "シュガーロード、ウフダチィ", it: "Sugar Road, Ufudachii", ru: "Сахарная дорога, Уфудачи" }, tips: { en: "Great for cycling.", ja: "サイクリングに最適。", it: "Ottimo per ciclismo.", ru: "Отлично для велосипеда." }, official: "#" },
+      iriomote: {
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Iriomote_Island_View.jpg/640px-Iriomote_Island_View.jpg",
+        description: { en: "Lush jungle, Iriomote wild cat, kayaking.", ja: "マングローブのカヤック、西表山猫で有名。", it: "Giungla lussureggiante, gatto selvatico di Iriomote.", ru: "Пышные джунгли, дикая кошка Ириомоте." },
+        access: { en: "30 min high-speed boat from Ishigaki port.", ja: "石垣港から高速船で30分。", it: "30 min di traghetto da Ishigaki.", ru: "30 минут на катере от Исигаки." },
+        sights: { en: "Pinaisara Falls, Hoshizuna Beach", ja: "ピナイサーラの滝、星砂の浜", it: "Cascate Pinaisara, Spiaggia di Hoshizuna", ru: "Водопад Пинайсара, Пляж Хосидзуна" },
+        tips: { en: "Bring insect repellent. Best season: spring/autumn.", ja: "虫除け必須。春・秋がおすすめ。", it: "Porta repellente. Primavera/autunno migliori.", ru: "Берите репеллент. Лучше весной/осенью." },
+        official: "https://visitokinawa.jp/"
+      },
+      taketomi: {
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Taketomi_Island_buffalo_cart.jpg/640px-Taketomi_Island_buffalo_cart.jpg",
+        description: { en: "Traditional Ryukyu village, water buffalo carts.", ja: "水牛車と赤瓦の集落。", it: "Villaggio tradizionale Ryukyu, carri trainati da bufali.", ru: "Традиционная деревня Рюкю, повозки с буйволами." },
+        access: { en: "10-15 min ferry from Ishigaki.", ja: "石垣港からフェリーで10〜15分。", it: "Traghetto 10-15 min da Ishigaki.", ru: "10-15 мин на пароме от Исигаки." },
+        sights: { en: "Kondoi Beach, Star Sand", ja: "コンドイビーチ、星砂", it: "Spiaggia Kondoi, Sabbia a stella", ru: "Пляж Кондой, Звездный песок" },
+        tips: { en: "Rent a bike to explore.", ja: "レンタル自転車が便利。", it: "Noleggia una bici.", ru: "Арендуйте велосипед." },
+        official: "https://www.taketomi-island.jp/"
+      },
+      kohama: {
+        image: "https://upload.wikimedia.org/wikipedia/commons/1/1f/Kohama_Island_01.jpg",
+        description: { en: "Relaxed island, sugarcane fields.", ja: "のどかな島、サトウキビ畑。", it: "Isola tranquilla, campi di canna da zucchero.", ru: "Спокойный остров, поля сахарного тростника." },
+        access: { en: "25 min ferry from Ishigaki.", ja: "石垣港から25分。", it: "25 min di traghetto.", ru: "25 минут паромом." },
+        sights: { en: "Sugar Road, Ufudachii", ja: "シュガーロード、ウフダチィ", it: "Sugar Road, Ufudachii", ru: "Сахарная дорога, Уфудачи" },
+        tips: { en: "Great for cycling.", ja: "サイクリングに最適。", it: "Ottimo per ciclismo.", ru: "Отлично для велосипеда." },
+        official: "#"
+      },
       kuro: { image: "https://upload.wikimedia.org/wikipedia/commons/0/0f/Kuroshima_Island_-_pasture.jpg", description: { en: "Famous for cows and starry sky.", ja: "牛と星空の島。", it: "Famoso per mucche e cielo stellato.", ru: "Знаменит коровами и звездами." }, access: { en: "25 min ferry.", ja: "石垣港から25分。" }, sights: { en: "Aiyaruhama Beach.", ja: "アイヤル浜" }, tips: { en: "Rent an ebike.", ja: "電動自転車推奨。" }, official: "#" },
       hatoma: { image: "https://upload.wikimedia.org/wikipedia/commons/9/95/Hatoma_Island.jpg", description: { en: "Tiny remote island, beautiful sunset.", ja: "小さな離島、絶景の夕日。", it: "Piccola remota, tramonto stupendo.", ru: "Маленький отдаленный остров." }, access: { en: "40 min ferry.", ja: "石垣港から40分。" }, sights: { en: "Hatoma Beach.", ja: "鳩間ビーチ" }, tips: { en: "No convenience store.", ja: "コンビニなし。" }, official: "#" },
       irrabu: { image: "https://upload.wikimedia.org/wikipedia/commons/f/fb/Irabu_Ohashi_Bridge.jpg", description: { en: "Connected by Irabu Bridge, stunning ocean views.", ja: "伊良部大橋で接続、絶景。", it: "Collegato da Irabu Bridge.", ru: "Соединён мостом Ирабу." }, access: { en: "Drive from Miyako.", ja: "宮古島から車で渡る。" }, sights: { en: "Toguchi no Hama beach, Makiyama Observatory.", ja: "渡口の浜、牧山展望台" }, tips: { en: "Sunset drive amazing.", ja: "ドライブ最高。" }, official: "#" },
@@ -303,80 +384,19 @@
     let currentGroup = null;
     let currentDetailId = null;
     let deferredPrompt;
-    let map = null;
-    let markers = [];
-    let googleMapsLoaded = false;
-    let pendingMapSetup = false;
+    let map;
 
-    // Google Maps 読み込み完了時のコールバック
-    window.onGoogleMapsLoaded = function() {
-      googleMapsLoaded = true;
-      if (currentView === "main") {
-        setupMap();
-      }
-    };
-
-    // 地図のセットアップ（メインページでのみ呼ばれる）
-    function setupMap() {
-      if (!googleMapsLoaded || typeof google === 'undefined' || !google.maps) {
-        // APIがまだ読み込まれていなければ1秒後に再試行
-        if (currentView === "main" && !pendingMapSetup) {
-          pendingMapSetup = true;
-          setTimeout(() => { pendingMapSetup = false; setupMap(); }, 1000);
-        }
-        return;
-      }
-      const mapContainer = document.getElementById("map");
-      if (!mapContainer) {
-        // コンテナがまだDOMにない（言語切替直後など）場合、少し待つ
-        setTimeout(() => { if (currentView === "main") setupMap(); }, 200);
-        return;
-      }
-      // 既にマップが存在する場合はリサイズと再センタリングのみ行う
-      if (map) {
-        google.maps.event.trigger(map, "resize");
-        map.setCenter({ lat: 24.3, lng: 124.0 });
-        map.setZoom(9.5);
-        // マーカーが消えている場合に備えて再追加（簡易）
-        if (markers.length === 0) addMarkersToMap();
-        return;
-      }
-      // 新規作成
-      map = new google.maps.Map(mapContainer, {
-        center: { lat: 24.3, lng: 124.0 },
-        zoom: 9.5,
-        mapId: "YAEYAMA_MIYAKO"
+    function initMap() {
+      const center = { lat: 24.6, lng: 124.7 };
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: center,
+        zoom: 8.5,
+        mapId: "ISLANDS_MAP"
       });
-      addMarkersToMap();
+      new google.maps.Marker({ position: { lat: 24.3442, lng: 124.1585 }, map, title: "Ishigaki" });
+      new google.maps.Marker({ position: { lat: 24.8067, lng: 125.2811 }, map, title: "Miyako" });
     }
 
-    function addMarkersToMap() {
-      if (!map) return;
-      // 既存マーカーを削除
-      markers.forEach(m => m.setMap(null));
-      markers = [];
-      const islands = [
-        { name: "Ishigaki", lat: 24.3442, lng: 124.1585 },
-        { name: "Iriomote", lat: 24.3385, lng: 123.8230 },
-        { name: "Taketomi", lat: 24.3243, lng: 124.0863 },
-        { name: "Kohama", lat: 24.3415, lng: 123.9833 },
-        { name: "Kuroshima", lat: 24.2333, lng: 124.0167 },
-        { name: "Hateruma", lat: 24.0583, lng: 123.7833 },
-        { name: "Miyako", lat: 24.8067, lng: 125.2811 },
-        { name: "Irabu", lat: 24.8344, lng: 125.1967 }
-      ];
-      islands.forEach(island => {
-        const marker = new google.maps.Marker({
-          position: { lat: island.lat, lng: island.lng },
-          map: map,
-          title: island.name,
-          animation: google.maps.Animation.DROP
-        });
-        markers.push(marker);
-      });
-    }
-
-    // レンダリング
     function render() {
       const app = document.getElementById("app");
       if (currentView === "main") {
@@ -408,7 +428,6 @@
           </div>
           <div class="map-container"><div id="map"></div></div>
         `;
-        // カードのイベント
         document.querySelectorAll(".card").forEach(card => {
           const detailId = card.dataset.detail;
           const detailBtn = card.querySelector(".detail-btn");
@@ -430,8 +449,8 @@
           currentView = "group";
           render();
         });
-        // 地図をセットアップ（APIがロード済みなら即座に、未ロードならコールバック待ち）
-        setupMap();
+        if (typeof google !== 'undefined' && map) setTimeout(() => google.maps.event.trigger(map, 'resize'), 100);
+        else if (typeof google !== 'undefined') initMap();
       } 
       else if (currentView === "group") {
         const group = islandsData[currentGroup];
@@ -484,7 +503,7 @@
       document.getElementById("main-title").innerText = t("title");
     }
 
-    // スポンサー関連
+    // スポンサー
     function updateSponsorDisplay() {
       const imgUrl = localStorage.getItem("sponsorImg") || "";
       const siteUrl = localStorage.getItem("sponsorUrl") || "";
@@ -504,12 +523,8 @@
       updateSponsorDisplay();
     }
 
-    // 言語切り替え
-    function setLang(lang) { 
-      currentLang = lang; 
-      render(); 
-      loadSponsorFromStorage(); 
-    }
+    // 言語
+    function setLang(lang) { currentLang = lang; render(); loadSponsorFromStorage(); }
     document.getElementById("langEN")?.addEventListener("click", () => setLang("en"));
     document.getElementById("langIT")?.addEventListener("click", () => setLang("it"));
     document.getElementById("langRU")?.addEventListener("click", () => setLang("ru"));
@@ -553,6 +568,7 @@
 
     loadSponsorFromStorage();
     render();
+    window.initMap = initMap;
   </script>
 </body>
 </html>
