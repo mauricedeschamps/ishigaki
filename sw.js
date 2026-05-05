@@ -1,39 +1,28 @@
-const CACHE_NAME = 'island-guide-v3';
+const CACHE_NAME = 'island-guide-v4';
 const urlsToCache = [
   '/',
   'index.html',
-  'manifest.json'
+  'manifest.json',
+  'icons/icon-192.png',
+  'icons/icon-512.png'
 ];
-
-// アイコンフォールバック用（リクエストされたアイコンが無ければデフォルト画像を返す）
-const DEFAULT_ICON_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAALTSURBVHgB7d1BctowFIZhQgJhB2EHZAdlB2UHZQdlB2UHZQd2UlgAWYB/3kyDZzJKZDk+9lhn3m8WjDXXlr7HkjxAkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJiS9B/8AAAD//wMAUQYDlhq57owAAAAASUVORK5CYII=';
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      // キャッシュに追加（アイコンはデフォルトでスキップしても良いが、後でフォールバック）
-      return cache.addAll(urlsToCache).catch(err => console.warn('Cache addAll error:', err));
+      return cache.addAll(urlsToCache).catch(err => {
+        console.warn('Some resources failed to cache:', err);
+      });
     })
   );
   self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
-  const url = event.request.url;
-  // アイコンファイルへのリクエストをインターセプト（存在しなくてもデフォルト画像を返す）
-  if (url.includes('/icons/icon-') || (url.includes('icon-192') || url.includes('icon-512'))) {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        return fetch(DEFAULT_ICON_BASE64);
-      })
-    );
-    return;
-  }
-  
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request).then(fetchRes => {
-        // GETリクエストで成功したらキャッシュに追加（オプション）
+        // GETリクエストで成功したものはキャッシュに追加（動的なリソースもキャッシュ）
         if (event.request.method === 'GET' && fetchRes.ok) {
           const responseClone = fetchRes.clone();
           caches.open(CACHE_NAME).then(cache => {
@@ -43,7 +32,7 @@ self.addEventListener('fetch', event => {
         return fetchRes;
       });
     }).catch(() => {
-      // 完全にオフライン時はindex.htmlを返す（SPA対策）
+      // 完全にオフライン時はトップページを返す
       return caches.match('index.html');
     })
   );
