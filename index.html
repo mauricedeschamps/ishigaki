@@ -7,7 +7,14 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e2a3a">
   <!-- Google Maps API (キーを設定してください) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY" async defer></script>
+  <script>
+    // APIキーが設定されていない場合のフォールバックメッセージ
+    window.GOOGLE_MAPS_API_KEY = 'YOUR_API_KEY'; // ここに実際のキーを入れてください
+    if (window.GOOGLE_MAPS_API_KEY === 'YOUR_API_KEY') {
+      console.warn('⚠️ Google Maps API key is not set. Please replace YOUR_API_KEY in index.html');
+    }
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=onGoogleMapsLoaded" async defer></script>
   <style>
     * {
       margin: 0;
@@ -296,25 +303,58 @@
     let currentGroup = null;
     let currentDetailId = null;
     let deferredPrompt;
-    let map;
+    let map = null;
     let markers = [];
+    let googleMapsLoaded = false;
+    let pendingMapSetup = false;
 
-    // マップ初期化（八重山諸島中心、主要島にマーカー）
-    function initMap() {
+    // Google Maps 読み込み完了時のコールバック
+    window.onGoogleMapsLoaded = function() {
+      googleMapsLoaded = true;
+      if (currentView === "main") {
+        setupMap();
+      }
+    };
+
+    // 地図のセットアップ（メインページでのみ呼ばれる）
+    function setupMap() {
+      if (!googleMapsLoaded || typeof google === 'undefined' || !google.maps) {
+        // APIがまだ読み込まれていなければ1秒後に再試行
+        if (currentView === "main" && !pendingMapSetup) {
+          pendingMapSetup = true;
+          setTimeout(() => { pendingMapSetup = false; setupMap(); }, 1000);
+        }
+        return;
+      }
       const mapContainer = document.getElementById("map");
-      if (!mapContainer) return; // まだDOMにない場合は後で再試行
-      const center = { lat: 24.3, lng: 124.0 };  // 八重山諸島を中心に設定
+      if (!mapContainer) {
+        // コンテナがまだDOMにない（言語切替直後など）場合、少し待つ
+        setTimeout(() => { if (currentView === "main") setupMap(); }, 200);
+        return;
+      }
+      // 既にマップが存在する場合はリサイズと再センタリングのみ行う
+      if (map) {
+        google.maps.event.trigger(map, "resize");
+        map.setCenter({ lat: 24.3, lng: 124.0 });
+        map.setZoom(9.5);
+        // マーカーが消えている場合に備えて再追加（簡易）
+        if (markers.length === 0) addMarkersToMap();
+        return;
+      }
+      // 新規作成
       map = new google.maps.Map(mapContainer, {
-        center: center,
+        center: { lat: 24.3, lng: 124.0 },
         zoom: 9.5,
         mapId: "YAEYAMA_MIYAKO"
       });
+      addMarkersToMap();
+    }
 
-      // 既存のマーカーを削除
+    function addMarkersToMap() {
+      if (!map) return;
+      // 既存マーカーを削除
       markers.forEach(m => m.setMap(null));
       markers = [];
-
-      // 主要な島々にマーカーを追加（名称付き）
       const islands = [
         { name: "Ishigaki", lat: 24.3442, lng: 124.1585 },
         { name: "Iriomote", lat: 24.3385, lng: 123.8230 },
@@ -334,21 +374,6 @@
         });
         markers.push(marker);
       });
-    }
-
-    // 地図のリサイズ＆再センタリング（メインページ表示時に呼ぶ）
-    function resetMap() {
-      if (map && currentView === "main") {
-        google.maps.event.trigger(map, "resize");
-        map.setCenter({ lat: 24.3, lng: 124.0 });
-        map.setZoom(9.5);
-      } else if (currentView === "main" && typeof google !== "undefined" && google.maps) {
-        // マップがまだ未初期化なら初期化を試みる
-        initMap();
-      } else if (currentView === "main" && typeof google === "undefined") {
-        // Google Maps API がまだ読み込まれていない場合、待つ
-        setTimeout(resetMap, 200);
-      }
     }
 
     // レンダリング
@@ -405,14 +430,8 @@
           currentView = "group";
           render();
         });
-        // 地図の初期化またはリセット
-        if (typeof google !== "undefined" && google.maps) {
-          if (!map) initMap();
-          else resetMap();
-        } else {
-          // APIがまだ読み込まれていない場合は少し待って再試行
-          setTimeout(() => { if (currentView === "main") resetMap(); }, 500);
-        }
+        // 地図をセットアップ（APIがロード済みなら即座に、未ロードならコールバック待ち）
+        setupMap();
       } 
       else if (currentView === "group") {
         const group = islandsData[currentGroup];
@@ -465,7 +484,7 @@
       document.getElementById("main-title").innerText = t("title");
     }
 
-    // スポンサー関連 (前回と同じ)
+    // スポンサー関連
     function updateSponsorDisplay() {
       const imgUrl = localStorage.getItem("sponsorImg") || "";
       const siteUrl = localStorage.getItem("sponsorUrl") || "";
@@ -485,8 +504,12 @@
       updateSponsorDisplay();
     }
 
-    // 言語
-    function setLang(lang) { currentLang = lang; render(); loadSponsorFromStorage(); }
+    // 言語切り替え
+    function setLang(lang) { 
+      currentLang = lang; 
+      render(); 
+      loadSponsorFromStorage(); 
+    }
     document.getElementById("langEN")?.addEventListener("click", () => setLang("en"));
     document.getElementById("langIT")?.addEventListener("click", () => setLang("it"));
     document.getElementById("langRU")?.addEventListener("click", () => setLang("ru"));
@@ -530,8 +553,6 @@
 
     loadSponsorFromStorage();
     render();
-    // Google Maps がロードされたときのフォールバック
-    window.initMap = initMap;
   </script>
 </body>
 </html>
