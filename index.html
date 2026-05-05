@@ -6,8 +6,6 @@
   <title>Yaeyama & Miyako Islands Guide</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e2a3a">
-  <!-- Google Maps API (キーを設定してください) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
   <style>
     * {
       margin: 0;
@@ -24,6 +22,7 @@
       --border: #2d3e4e;
       --card-bg: #1e2a3a;
       --btn-bg: #2d3e4e;
+      --input-bg: #2d3e4e;
     }
     body.light {
       --bg: #f5f7fa;
@@ -33,6 +32,7 @@
       --border: #ccd7e4;
       --card-bg: #ffffff;
       --btn-bg: #e9edf2;
+      --input-bg: #ffffff;
     }
 
     body {
@@ -198,19 +198,46 @@
       color: var(--text-secondary);
       text-decoration: none;
     }
-    .map-container {
-      margin: 24px 0;
-      border-radius: 28px;
-      overflow: hidden;
-      height: 320px;
-    }
-    #map {
-      height: 100%;
-      width: 100%;
-    }
     hr {
       border-color: var(--border);
       margin: 12px 0;
+    }
+    /* 地図URLセクションのスタイル */
+    .map-url-section {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .map-url-section input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 40px;
+      border: 1px solid var(--border);
+      background-color: var(--input-bg);
+      color: var(--text);
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+    .map-url-section .save-map-url {
+      font-size: 0.8rem;
+      padding: 5px 12px;
+      margin-right: 8px;
+    }
+    .map-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      background-color: #2c6e9e;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 40px;
+      text-decoration: none;
+    }
+    .map-link:hover {
+      opacity: 0.9;
+    }
+    .card .detail-btn {
+      margin-top: 8px;
     }
     @media (max-width: 640px) {
       body { padding: 0 12px; }
@@ -265,7 +292,10 @@
         backToMain: "← Back to Main",
         sponsorDefault: "✨ Sponsor space ✨",
         officialWebsite: "Official Website",
-        detailsButton: "View Details →"
+        detailsButton: "View Details →",
+        mapUrlPlaceholder: "Enter map URL (Google Maps, etc.)",
+        saveMapUrl: "Save Map URL",
+        viewMap: "🗺️ View Map"
       },
       it: {
         title: "🌊 Isole Yaeyama e Miyako",
@@ -273,7 +303,10 @@
         backToMain: "← Torna alla Home",
         sponsorDefault: "✨ Spazio Sponsor ✨",
         officialWebsite: "Sito Ufficiale",
-        detailsButton: "Vedi Dettagli →"
+        detailsButton: "Vedi Dettagli →",
+        mapUrlPlaceholder: "Inserisci URL mappa (Google Maps, ecc.)",
+        saveMapUrl: "Salva URL mappa",
+        viewMap: "🗺️ Visualizza Mappa"
       },
       ru: {
         title: "🌊 Острова Яэяма и Мияко",
@@ -281,7 +314,10 @@
         backToMain: "← На главную",
         sponsorDefault: "✨ Место для спонсора ✨",
         officialWebsite: "Официальный сайт",
-        detailsButton: "Подробнее →"
+        detailsButton: "Подробнее →",
+        mapUrlPlaceholder: "Введите URL карты (Google Maps и т.д.)",
+        saveMapUrl: "Сохранить URL карты",
+        viewMap: "🗺️ Посмотреть карту"
       },
       ja: {
         title: "🌊 八重山・宮古諸島ガイド",
@@ -289,7 +325,10 @@
         backToMain: "← メインページへ戻る",
         sponsorDefault: "✨ スポンサー枠 ✨",
         officialWebsite: "公式サイト",
-        detailsButton: "詳細を見る →"
+        detailsButton: "詳細を見る →",
+        mapUrlPlaceholder: "地図のURLを入力 (Googleマップなど)",
+        saveMapUrl: "地図URLを保存",
+        viewMap: "🗺️ 地図を見る"
       }
     };
     let currentLang = "en";
@@ -384,22 +423,22 @@
     let currentGroup = null;
     let currentDetailId = null;
     let deferredPrompt;
-    let map;
 
-    function initMap() {
-      const center = { lat: 24.6, lng: 124.7 };
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: center,
-        zoom: 8.5,
-        mapId: "ISLANDS_MAP"
-      });
-      new google.maps.Marker({ position: { lat: 24.3442, lng: 124.1585 }, map, title: "Ishigaki" });
-      new google.maps.Marker({ position: { lat: 24.8067, lng: 125.2811 }, map, title: "Miyako" });
+    // 地図URL保存用ヘルパー
+    function getMapUrl(islandId) {
+      return localStorage.getItem(`mapUrl_${islandId}`) || "";
+    }
+    function setMapUrl(islandId, url) {
+      localStorage.setItem(`mapUrl_${islandId}`, url);
     }
 
     function render() {
       const app = document.getElementById("app");
       if (currentView === "main") {
+        // 石垣島と宮古島のカードを作成（地図URL設定機能付き）
+        const ishigakiMapUrl = getMapUrl("ishigaki");
+        const miyakoMapUrl = getMapUrl("miyakoMain");
+        
         app.innerHTML = `
           <h2 style="text-align:center">${t("mainPageTitle")}</h2>
           <div class="card-grid">
@@ -408,6 +447,12 @@
               <img class="main-island-img" src="${mainIslandsDetails.ishigaki.image}" alt="Ishigaki" onerror="this.src='https://placehold.co/600x300?text=Ishigaki'">
               <p>${getName(mainIslandsDetails.ishigaki.description, "Gateway to Yaeyama islands.")}</p>
               <a href="${mainIslandsDetails.ishigaki.official}" target="_blank" class="official-btn" onclick="event.stopPropagation()">${t("officialWebsite")}</a>
+              <!-- 地図URL設定セクション -->
+              <div class="map-url-section" onclick="event.stopPropagation()">
+                <input type="text" id="mapUrlInput_ishigaki" placeholder="${t("mapUrlPlaceholder")}" value="${escapeHtml(ishigakiMapUrl)}">
+                <button class="save-map-url" data-id="ishigaki">${t("saveMapUrl")}</button>
+                ${ishigakiMapUrl ? `<a href="${escapeHtml(ishigakiMapUrl)}" target="_blank" class="map-link" onclick="event.stopPropagation()">${t("viewMap")}</a>` : ''}
+              </div>
               <div style="margin-top:12px"><button class="detail-btn">${t("detailsButton")}</button></div>
             </div>
             <div class="card" data-detail="miyakoMain">
@@ -415,6 +460,11 @@
               <img class="main-island-img" src="${mainIslandsDetails.miyakoMain.image}" alt="Miyako" onerror="this.src='https://placehold.co/600x300?text=Miyako'">
               <p>${getName(mainIslandsDetails.miyakoMain.description, "Coral paradise.")}</p>
               <a href="${mainIslandsDetails.miyakoMain.official}" target="_blank" class="official-btn" onclick="event.stopPropagation()">${t("officialWebsite")}</a>
+              <div class="map-url-section" onclick="event.stopPropagation()">
+                <input type="text" id="mapUrlInput_miyakoMain" placeholder="${t("mapUrlPlaceholder")}" value="${escapeHtml(miyakoMapUrl)}">
+                <button class="save-map-url" data-id="miyakoMain">${t("saveMapUrl")}</button>
+                ${miyakoMapUrl ? `<a href="${escapeHtml(miyakoMapUrl)}" target="_blank" class="map-link" onclick="event.stopPropagation()">${t("viewMap")}</a>` : ''}
+              </div>
               <div style="margin-top:12px"><button class="detail-btn">${t("detailsButton")}</button></div>
             </div>
           </div>
@@ -426,8 +476,9 @@
               <button id="gotoMiyakoGroup" style="background:#2c6e9e;">🏝️ Miyako's Nearby Islands</button>
             </div>
           </div>
-          <div class="map-container"><div id="map"></div></div>
         `;
+        
+        // カードクリックで詳細へ
         document.querySelectorAll(".card").forEach(card => {
           const detailId = card.dataset.detail;
           const detailBtn = card.querySelector(".detail-btn");
@@ -439,6 +490,21 @@
           card.addEventListener("click", gotoDetail);
           if (detailBtn) detailBtn.addEventListener("click", (e) => { e.stopPropagation(); gotoDetail(); });
         });
+        
+        // 地図URL保存ボタンのイベント
+        document.querySelectorAll(".save-map-url").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const islandId = btn.getAttribute("data-id");
+            const input = document.getElementById(`mapUrlInput_${islandId}`);
+            if (input) {
+              const newUrl = input.value.trim();
+              setMapUrl(islandId, newUrl);
+              render(); // 再描画してリンク表示を更新
+            }
+          });
+        });
+        
         document.getElementById("gotoYaeyamaGroup")?.addEventListener("click", () => {
           currentGroup = "yaeyama";
           currentView = "group";
@@ -449,8 +515,6 @@
           currentView = "group";
           render();
         });
-        if (typeof google !== 'undefined' && map) setTimeout(() => google.maps.event.trigger(map, 'resize'), 100);
-        else if (typeof google !== 'undefined') initMap();
       } 
       else if (currentView === "group") {
         const group = islandsData[currentGroup];
@@ -502,8 +566,21 @@
       updateSponsorDisplay();
       document.getElementById("main-title").innerText = t("title");
     }
+    
+    // XSS対策簡易エスケープ
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+        return c;
+      });
+    }
 
-    // スポンサー
+    // スポンサー機能 (変更なし)
     function updateSponsorDisplay() {
       const imgUrl = localStorage.getItem("sponsorImg") || "";
       const siteUrl = localStorage.getItem("sponsorUrl") || "";
@@ -523,14 +600,14 @@
       updateSponsorDisplay();
     }
 
-    // 言語
+    // 言語切り替え
     function setLang(lang) { currentLang = lang; render(); loadSponsorFromStorage(); }
     document.getElementById("langEN")?.addEventListener("click", () => setLang("en"));
     document.getElementById("langIT")?.addEventListener("click", () => setLang("it"));
     document.getElementById("langRU")?.addEventListener("click", () => setLang("ru"));
     document.getElementById("langJA")?.addEventListener("click", () => setLang("ja"));
 
-    // テーマ
+    // テーマ切り替え
     const body = document.body;
     const themeToggle = document.getElementById("themeToggle");
     if (localStorage.getItem("theme") === "light") { body.classList.remove("dark"); body.classList.add("light"); }
@@ -568,7 +645,6 @@
 
     loadSponsorFromStorage();
     render();
-    window.initMap = initMap;
   </script>
 </body>
 </html>
