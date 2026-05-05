@@ -21,7 +21,8 @@
       --text-secondary: #b0c4de;
       --border: #2d3e4e;
       --card-bg: #1e2a3a;
-      --btn-bg: #2d3e4e;
+      --btn-bg: #2c6e9e;
+      --btn-hover: #1e4f73;
     }
     body.light {
       --bg: #f5f7fa;
@@ -30,7 +31,8 @@
       --text-secondary: #2c3e50;
       --border: #ccd7e4;
       --card-bg: #ffffff;
-      --btn-bg: #e9edf2;
+      --btn-bg: #2c6e9e;
+      --btn-hover: #1e4f73;
     }
 
     body {
@@ -65,14 +67,18 @@
     .lang-btn, .theme-btn, .install-btn {
       background-color: var(--btn-bg);
       border: none;
-      font-size: 1.4rem;
+      font-size: 1rem;
       cursor: pointer;
-      padding: 6px 12px;
+      padding: 8px 16px;
       border-radius: 40px;
-      color: var(--text);
+      color: white;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      font-weight: 500;
+    }
+    .lang-btn:hover, .theme-btn:hover, .install-btn:hover {
+      background-color: var(--btn-hover);
     }
 
     .sponsor-area {
@@ -114,10 +120,11 @@
       padding: 20px;
       width: 380px;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     .card:hover {
       transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
     .main-island-img {
       width: 100%;
@@ -144,20 +151,31 @@
       justify-content: center;
       height: 100%;
       background: var(--btn-bg);
-      color: var(--text-secondary);
+      color: white;
       font-size: 0.9rem;
       text-align: center;
       padding: 20px;
+      border-radius: 16px;
     }
-    .official-btn {
+    .official-btn, .detail-btn, .back-btn, .group-btn {
       display: inline-block;
-      margin-top: 12px;
-      background-color: #2c6e9e;
+      background-color: var(--btn-bg);
       color: white;
       text-decoration: none;
-      padding: 8px 16px;
+      padding: 8px 20px;
       border-radius: 40px;
       font-size: 0.9rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .official-btn:hover, .detail-btn:hover, .back-btn:hover, .group-btn:hover {
+      background-color: var(--btn-hover);
+    }
+    .detail-btn {
+      width: 100%;
+      margin-top: 8px;
     }
     .island-list {
       display: flex;
@@ -173,6 +191,12 @@
       padding: 14px 20px;
       cursor: pointer;
       font-weight: bold;
+      text-align: center;
+      transition: background 0.2s;
+    }
+    .list-item:hover {
+      background: var(--btn-bg);
+      color: white;
     }
     .detail-view {
       background: var(--card-bg);
@@ -188,10 +212,6 @@
       border-radius: 24px;
       margin: 16px 0;
     }
-    .back-btn {
-      margin-top: 30px;
-      display: inline-block;
-    }
     footer a {
       color: var(--text-secondary);
       text-decoration: none;
@@ -199,6 +219,13 @@
     hr {
       border-color: var(--border);
       margin: 12px 0;
+    }
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 20px 0;
     }
     @media (max-width: 640px) {
       body { padding: 0 12px; }
@@ -219,7 +246,7 @@
     </div>
   </header>
 
-  <!-- スポンサー上部（コード内の変数SPONSOR_IMG_URL, SPONSOR_SITE_URLで内容を変更できます） -->
+  <!-- スポンサー上部（コード内変数で設定） -->
   <div class="sponsor-area" id="sponsorTop">
     <div class="sponsor-content" id="sponsorContentTop">
       <span id="sponsorTextTop">✨ Sponsor space ✨</span>
@@ -267,8 +294,9 @@
         sponsorDefault: "✨ Sponsor space ✨",
         officialWebsite: "Official Website",
         detailsButton: "View Details →",
-        noMap: "🗺️ Map URL not set. Please edit the code to add a map.",
-        mapLabel: "Map"
+        noMap: "🗺️ Map URL not set. Edit the code to add a map.",
+        nearIslandsBtn: "🏝️ Nearby Islands (Yaeyama)",
+        nearMiyakoBtn: "🏝️ Nearby Islands (Miyako)"
       },
       it: {
         title: "🌊 Isole Yaeyama e Miyako",
@@ -277,8 +305,9 @@
         sponsorDefault: "✨ Spazio Sponsor ✨",
         officialWebsite: "Sito Ufficiale",
         detailsButton: "Vedi Dettagli →",
-        noMap: "🗺️ Mappa non configurata. Modifica il codice per aggiungere una mappa.",
-        mapLabel: "Mappa"
+        noMap: "🗺️ Mappa non configurata. Modifica il codice.",
+        nearIslandsBtn: "🏝️ Isole vicine (Yaeyama)",
+        nearMiyakoBtn: "🏝️ Isole vicine (Miyako)"
       },
       ru: {
         title: "🌊 Острова Яэяма и Мияко",
@@ -288,7 +317,8 @@
         officialWebsite: "Официальный сайт",
         detailsButton: "Подробнее →",
         noMap: "🗺️ URL карты не задан. Отредактируйте код.",
-        mapLabel: "Карта"
+        nearIslandsBtn: "🏝️ Ближайшие острова (Яэяма)",
+        nearMiyakoBtn: "🏝️ Ближайшие острова (Мияко)"
       },
       ja: {
         title: "🌊 八重山・宮古諸島ガイド",
@@ -297,8 +327,9 @@
         sponsorDefault: "✨ スポンサー枠 ✨",
         officialWebsite: "公式サイト",
         detailsButton: "詳細を見る →",
-        noMap: "🗺️ 地図URLが未設定です。コードを編集して追加してください。",
-        mapLabel: "地図"
+        noMap: "🗺️ 地図URLが未設定です。コードを編集してください。",
+        nearIslandsBtn: "🏝️ 石垣島周辺の島々（八重山）",
+        nearMiyakoBtn: "🏝️ 宮古島周辺の島々"
       }
     };
     let currentLang = "en";
@@ -422,12 +453,9 @@
             </div>
           </div>
           <hr>
-          <div style="text-align:center; margin: 20px 0 10px;">
-            <h3>🔍 Explore Nearby Islands</h3>
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:16px; margin-top:12px;">
-              <button id="gotoYaeyamaGroup" style="background:#2c6e9e;">🏝️ Ishigaki's Nearby Islands (Yaeyama)</button>
-              <button id="gotoMiyakoGroup" style="background:#2c6e9e;">🏝️ Miyako's Nearby Islands</button>
-            </div>
+          <div class="button-group">
+            <button id="gotoYaeyamaGroup" class="group-btn">${t("nearIslandsBtn")}</button>
+            <button id="gotoMiyakoGroup" class="group-btn">${t("nearMiyakoBtn")}</button>
           </div>
         `;
         document.querySelectorAll(".card").forEach(card => {
@@ -503,7 +531,7 @@
       document.getElementById("main-title").innerText = t("title");
     }
 
-    // スポンサー表示（コード上部で設定した変数を使用）
+    // スポンサー表示（コード上部の変数を使用）
     function updateSponsorDisplay() {
       const hasSponsor = SPONSOR_IMG_URL && SPONSOR_SITE_URL;
       const htmlTop = hasSponsor 
@@ -538,27 +566,43 @@
       }
     });
 
-    // PWA インストール
+    // PWA インストール（確実に動作するよう改善）
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
       const installBtn = document.getElementById("installApp");
-      if (installBtn) installBtn.style.display = "inline-flex";
-      installBtn?.addEventListener("click", async () => {
-        installBtn.style.display = "none";
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          const { outcome } = await deferredPrompt.userChoice;
-          deferredPrompt = null;
-        }
-      });
+      if (installBtn) {
+        installBtn.style.display = "inline-flex";
+        // 既存のリスナーを削除して重複防止
+        const newBtn = installBtn.cloneNode(true);
+        installBtn.parentNode.replaceChild(newBtn, installBtn);
+        newBtn.addEventListener("click", async () => {
+          newBtn.style.display = "none";
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+          }
+        });
+      }
     });
 
-    // Service Worker 登録
+    // Service Worker 登録（キャッシュ名を更新）
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").then(reg => console.log("SW registered:", reg)).catch(err => console.log("SW failed:", err));
+        navigator.serviceWorker.register("sw.js").then(reg => {
+          console.log("SW registered successfully:", reg);
+        }).catch(err => {
+          console.error("SW registration failed:", err);
+        });
       });
+    }
+
+    // インストールできない場合のフォールバック表示（開発者向け）
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      console.log("App is running in standalone mode");
+    } else {
+      console.log("App is running in browser. Install PWA for better experience.");
     }
 
     render();
