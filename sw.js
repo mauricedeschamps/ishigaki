@@ -1,10 +1,10 @@
-const CACHE_NAME = 'island-guide-v4';
+const CACHE_NAME = 'island-guide-v5';
 const urlsToCache = [
   '/',
   'index.html',
   'manifest.json',
-  'icons/icon-192.png',
-  'icons/icon-512.png'
+  'icons/icon-192.jpg',
+  'icons/icon-512.jpg'
 ];
 
 self.addEventListener('install', event => {
@@ -22,7 +22,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request).then(fetchRes => {
-        // GETリクエストで成功したものはキャッシュに追加（動的なリソースもキャッシュ）
         if (event.request.method === 'GET' && fetchRes.ok) {
           const responseClone = fetchRes.clone();
           caches.open(CACHE_NAME).then(cache => {
@@ -32,7 +31,6 @@ self.addEventListener('fetch', event => {
         return fetchRes;
       });
     }).catch(() => {
-      // 完全にオフライン時はトップページを返す
       return caches.match('index.html');
     })
   );
