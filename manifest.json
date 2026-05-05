@@ -3,6 +3,7 @@
   "short_name": "IslandGuide",
   "description": "Guide to Ishigaki, Miyako and surrounding islands",
   "start_url": "index.html",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#1e2a3a",
   "background_color": "#121212",
