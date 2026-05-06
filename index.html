@@ -83,7 +83,7 @@
       margin: 20px 0;
       text-align: center;
     }
-    .sponsor img { max-height: 80px; max-width: 100%; border-radius: 12px; }
+    .sponsor img { max-height: 80px; max-width: 100%; border-radius: 12px; object-fit: contain; }
     .sponsor a { color: #4a9eff; text-decoration: none; word-break: break-all; }
 
     .card-grid {
@@ -116,13 +116,18 @@
       margin: 16px 0;
       border-radius: 16px;
       overflow: hidden;
-      height: 180px;
       background: var(--bg);
+      text-align: center;
     }
-    .map iframe { width: 100%; height: 100%; border: none; }
+    .map-img {
+      width: 100%;
+      max-height: 180px;
+      object-fit: contain;
+      background: var(--surface);
+    }
     .map-placeholder {
       background: var(--btn);
-      height: 100%;
+      height: 120px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -130,6 +135,7 @@
       font-size: 0.9rem;
       text-align: center;
       padding: 12px;
+      border-radius: 16px;
     }
 
     .detail-view {
@@ -195,35 +201,40 @@
   // ============================================================
   // ★ 設定エリア（ここを書き換えてください） ★
   // ============================================================
-  const SPONSOR_IMG_URL = "https://www.euglena.jp/wp_01/wp-content/uploads/2023/10/efd456796c829c131a17e6e6526cbc82.png";      // 例: "https://example.com/sponsor.jpg"
-  const SPONSOR_LINK_URL = "https://www.euglena.jp/";     // 例: "https://example.com"
-  const ISHIGAKI_MAP_URL = "https://www.samuraitours.com/wp-content/uploads/2020/05/e_top_map.gif";     // 石垣島 地図iframe src
-  const MIYAKO_MAP_URL = "https://i0.wp.com/perfect47japan.com/wp-content/uploads/2023/06/Glory-Island-33.jpg?resize=1024%2C683&ssl=1";       // 宮古島 地図iframe src
+  // スポンサー画像URL（空文字で非表示）とリンク先URL
+  const SPONSOR_IMG_URL = "https://www.euglena.jp/wp_01/wp-content/uploads/2023/10/efd456796c829c131a17e6e6526cbc82.png";
+  const SPONSOR_LINK_URL = "https://www.euglena.jp/";
+  
+  // 石垣島の地図画像URL（地図のスクリーンショットなど、画像への直リンク）
+  const ISHIGAKI_MAP_URL = "https://www.samuraitours.com/wp-content/uploads/2020/05/e_top_map.gif";
+  
+  // 宮古島の地図画像URL
+  const MIYAKO_MAP_URL = "https://i0.wp.com/perfect47japan.com/wp-content/uploads/2023/06/Glory-Island-33.jpg?resize=1024%2C683&ssl=1";
   // ============================================================
 
   // ---------- 多言語 ----------
   const texts = {
     en: {
       title: "🌊 Yaeyama & Miyako Islands", mainTitle: "Main Islands", back: "← Back to Main",
-      details: "View Details →", official: "Official Website", noMap: "🗺️ Map URL not set (edit code)",
+      details: "View Details →", official: "Official Website", noMap: "🗺️ Map image not set (edit code)",
       sponsorDefault: "✨ Sponsor Space ✨<br><small>Edit SPONSOR_IMG_URL and SPONSOR_LINK_URL</small>",
       nearbyYaeyama: "🏝️ Nearby Islands (Yaeyama)", nearbyMiyako: "🏝️ Nearby Islands (Miyako)"
     },
     it: {
       title: "🌊 Isole Yaeyama e Miyako", mainTitle: "Isole Principali", back: "← Torna alla Home",
-      details: "Vedi Dettagli →", official: "Sito Ufficiale", noMap: "🗺️ Mappa non impostata (modifica codice)",
+      details: "Vedi Dettagli →", official: "Sito Ufficiale", noMap: "🗺️ Immagine mappa non impostata (modifica codice)",
       sponsorDefault: "✨ Spazio Sponsor ✨<br><small>Modifica SPONSOR_IMG_URL e SPONSOR_LINK_URL</small>",
       nearbyYaeyama: "🏝️ Isole vicine (Yaeyama)", nearbyMiyako: "🏝️ Isole vicine (Miyako)"
     },
     ru: {
       title: "🌊 Острова Яэяма и Мияко", mainTitle: "Главные острова", back: "← На главную",
-      details: "Подробнее →", official: "Официальный сайт", noMap: "🗺️ URL карты не задан (редактировать код)",
+      details: "Подробнее →", official: "Официальный сайт", noMap: "🗺️ Изображение карты не задано (редактировать код)",
       sponsorDefault: "✨ Место для спонсора ✨<br><small>Измените SPONSOR_IMG_URL и SPONSOR_LINK_URL</small>",
       nearbyYaeyama: "🏝️ Ближайшие острова (Яэяма)", nearbyMiyako: "🏝️ Ближайшие острова (Мияко)"
     },
     ja: {
       title: "🌊 八重山・宮古諸島ガイド", mainTitle: "メイン島", back: "← メインページへ戻る",
-      details: "詳細を見る →", official: "公式サイト", noMap: "🗺️ 地図URL未設定（コードを編集）",
+      details: "詳細を見る →", official: "公式サイト", noMap: "🗺️ 地図画像が未設定（コードを編集）",
       sponsorDefault: "✨ スポンサー枠 ✨<br><small>SPONSOR_IMG_URLとSPONSOR_LINK_URLを編集</small>",
       nearbyYaeyama: "🏝️ 石垣島周辺の島々（八重山）", nearbyMiyako: "🏝️ 宮古島周辺の島々"
     }
@@ -354,9 +365,9 @@
   }
 
   function updateSponsors() {
-    const hasSponsor = SPONSOR_IMG_URL && SPONSOR_LINK_URL;
+    const hasSponsor = SPONSOR_IMG_URL && SPONSOR_IMG_URL.trim() !== "" && SPONSOR_LINK_URL && SPONSOR_LINK_URL.trim() !== "";
     const content = hasSponsor 
-      ? `<img src="${SPONSOR_IMG_URL}" alt="sponsor"><br><a href="${SPONSOR_LINK_URL}" target="_blank" rel="noopener">${SPONSOR_LINK_URL}</a>`
+      ? `<img src="${SPONSOR_IMG_URL}" alt="sponsor" style="max-height:80px; max-width:100%; border-radius:12px;"><br><a href="${SPONSOR_LINK_URL}" target="_blank" rel="noopener">${SPONSOR_LINK_URL}</a>`
       : t("sponsorDefault");
     document.getElementById("sponsorTop").innerHTML = content;
     document.getElementById("sponsorBottom").innerHTML = content;
@@ -370,17 +381,21 @@
       <div class="card-grid">
         <div class="card" data-id="ishigaki">
           <h3>${getName(mainIslands.ishigaki.name)}</h3>
-          <img class="card-img" src="${mainIslands.ishigaki.image}" onerror="this.src='https://placehold.co/600x300'">
+          <img class="card-img" src="${mainIslands.ishigaki.image}" onerror="this.src='https://placehold.co/600x300?text=Ishigaki'">
           <p>${getName(mainIslands.ishigaki.desc)}</p>
-          <div class="map">${ISHIGAKI_MAP_URL ? `<iframe src="${ISHIGAKI_MAP_URL}" loading="lazy"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}</div>
+          <div class="map">
+            ${ISHIGAKI_MAP_URL ? `<img class="map-img" src="${ISHIGAKI_MAP_URL}" alt="Ishigaki Map" onerror="this.src='https://placehold.co/600x200?text=Map+load+error'">` : `<div class="map-placeholder">${t("noMap")}</div>`}
+          </div>
           <a href="${mainIslands.ishigaki.official}" target="_blank" style="display:inline-block; background:#2c6e9e; color:white; padding:6px 12px; border-radius:40px; text-decoration:none; margin-top:8px;">${t("official")}</a>
           <button class="detail-btn" style="margin-top:12px; width:100%;">${t("details")}</button>
         </div>
         <div class="card" data-id="miyako">
           <h3>${getName(mainIslands.miyako.name)}</h3>
-          <img class="card-img" src="${mainIslands.miyako.image}" onerror="this.src='https://placehold.co/600x300'">
+          <img class="card-img" src="${mainIslands.miyako.image}" onerror="this.src='https://placehold.co/600x300?text=Miyako'">
           <p>${getName(mainIslands.miyako.desc)}</p>
-          <div class="map">${MIYAKO_MAP_URL ? `<iframe src="${MIYAKO_MAP_URL}" loading="lazy"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}</div>
+          <div class="map">
+            ${MIYAKO_MAP_URL ? `<img class="map-img" src="${MIYAKO_MAP_URL}" alt="Miyako Map" onerror="this.src='https://placehold.co/600x200?text=Map+load+error'">` : `<div class="map-placeholder">${t("noMap")}</div>`}
+          </div>
           <a href="${mainIslands.miyako.official}" target="_blank" style="display:inline-block; background:#2c6e9e; color:white; padding:6px 12px; border-radius:40px; text-decoration:none; margin-top:8px;">${t("official")}</a>
           <button class="detail-btn" style="margin-top:12px; width:100%;">${t("details")}</button>
         </div>
@@ -437,7 +452,7 @@
     });
   }
 
-  // 詳細ページ（メイン島・周辺島共通、修正版）
+  // 詳細ページ（メイン島・周辺島共通）
   function renderDetail() {
     let data;
     let isMain = false;
@@ -463,7 +478,6 @@
       official = data.official;
       image = data.image;
     } else {
-      // 周辺島：フラットなプロパティから言語対応テキストを取得
       name = getName({ en: data.nameEn, ja: data.nameJa, it: data.nameIt, ru: data.nameRu }, data.id);
       desc = getNearbyText(data, "desc");
       access = getNearbyText(data, "access");
@@ -537,7 +551,8 @@
         deferredPrompt = null;
       }
     };
-    document.querySelector(".toolbar")?.appendChild(btn);
+    const toolbar = document.querySelector(".toolbar");
+    if (toolbar) toolbar.appendChild(btn);
   });
 
   // Service Worker
