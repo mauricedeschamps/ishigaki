@@ -3,234 +3,536 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Yaeyama & Miyako Islands Guide</title>
+  <title>Yaeyama & Miyako Guide</title>
+  
+  <!-- PWA + iPhone 対応 -->
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.jpg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#1e2a3a">
+  
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s, color 0.2s; }
-    body.dark { --bg: #121212; --surface: #1e2a3a; --text: #eef2f5; --text-secondary: #b0c4de; --border: #2d3e4e; --card-bg: #1e2a3a; --btn-bg: #2c6e9e; --btn-hover: #1e4f73; }
-    body.light { --bg: #f5f7fa; --surface: #ffffff; --text: #1e2a3a; --text-secondary: #2c3e50; --border: #ccd7e4; --card-bg: #ffffff; --btn-bg: #2c6e9e; --btn-hover: #1e4f73; }
-    body { background-color: var(--bg); color: var(--text); font-family: system-ui, 'Segoe UI', Roboto, sans-serif; line-height: 1.5; padding: 0 16px; }
-    header, footer { background-color: var(--surface); padding: 16px; border-radius: 20px; margin: 16px 0; border: 1px solid var(--border); }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* テーマ変数 (ダークがデフォルト) */
+    body.dark {
+      --bg: #121212;
+      --surface: #1e2a3a;
+      --text: #eef2f5;
+      --text-light: #b0c4de;
+      --border: #2d3e4e;
+      --card: #1e2a3a;
+      --btn: #2c6e9e;
+      --btn-hover: #1e4f73;
+    }
+    body.light {
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --text: #1e2a3a;
+      --text-light: #2c3e50;
+      --border: #ccd7e4;
+      --card: #ffffff;
+      --btn: #2c6e9e;
+      --btn-hover: #1e4f73;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      padding: 16px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ヘッダー・フッター（固定せずスクロール） */
+    header, footer {
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      border: 1px solid var(--border);
+    }
+
     h1 { font-size: 1.8rem; margin-bottom: 8px; }
-    .toolbar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 12px; }
-    .lang-btn, .theme-btn, .install-btn { background-color: var(--btn-bg); border: none; font-size: 1rem; cursor: pointer; padding: 8px 16px; border-radius: 40px; color: white; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
-    .lang-btn:hover, .theme-btn:hover, .install-btn:hover { background-color: var(--btn-hover); }
-    .sponsor-area { background-color: var(--surface); border: 1px dashed var(--border); border-radius: 20px; padding: 16px; margin: 20px 0; text-align: center; }
-    .sponsor-content { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    .sponsor-img { max-width: 100%; max-height: 80px; border-radius: 12px; object-fit: contain; }
-    .sponsor-link { color: #4a9eff; text-decoration: none; }
-    .card-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin: 20px 0; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 28px; padding: 20px; width: 380px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-    .main-island-img { width: 100%; height: 160px; object-fit: cover; border-radius: 20px; margin: 12px 0; }
-    .map-preview { margin: 16px 0 12px; border-radius: 16px; overflow: hidden; background: var(--bg); height: 200px; }
-    .map-preview iframe { width: 100%; height: 100%; border: none; }
-    .map-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; background: var(--btn-bg); color: white; font-size: 0.9rem; text-align: center; padding: 20px; border-radius: 16px; }
-    .official-btn, .detail-btn, .back-btn, .group-btn { display: inline-block; background-color: var(--btn-bg); color: white; text-decoration: none; padding: 8px 20px; border-radius: 40px; font-size: 0.9rem; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s; }
-    .official-btn:hover, .detail-btn:hover, .back-btn:hover, .group-btn:hover { background-color: var(--btn-hover); }
-    .detail-btn { width: 100%; margin-top: 8px; }
-    .island-list { display: flex; flex-direction: column; gap: 12px; max-width: 600px; margin: 0 auto; }
-    .list-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 40px; padding: 14px 20px; cursor: pointer; font-weight: bold; text-align: center; transition: background 0.2s; }
-    .list-item:hover { background: var(--btn-bg); color: white; }
-    .detail-view { background: var(--card-bg); border-radius: 32px; padding: 24px; max-width: 800px; margin: 0 auto; }
-    .detail-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 24px; margin: 16px 0; }
-    footer a { color: var(--text-secondary); text-decoration: none; }
-    hr { border-color: var(--border); margin: 12px 0; }
-    .button-group { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin: 20px 0; }
-    @media (max-width: 640px) { body { padding: 0 12px; } .card { width: 100%; } }
+    h2 { margin: 20px 0 12px; font-size: 1.4rem; }
+
+    /* ツールバー */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    button {
+      background: var(--btn);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 40px;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: var(--btn-hover); }
+
+    /* スポンサー枠 */
+    .sponsor {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 24px;
+      padding: 16px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .sponsor img {
+      max-height: 80px;
+      max-width: 100%;
+      border-radius: 12px;
+    }
+    .sponsor a {
+      color: #4a9eff;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    /* カードグリッド */
+    .card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 20px;
+      width: 340px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: translateY(-5px); }
+    .card-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 20px;
+      margin: 12px 0;
+    }
+    .card h3 { font-size: 1.4rem; }
+
+    /* 地図プレースホルダ */
+    .map {
+      margin: 16px 0;
+      border-radius: 16px;
+      overflow: hidden;
+      height: 180px;
+      background: var(--bg);
+    }
+    .map iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .map-placeholder {
+      background: var(--btn);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 12px;
+    }
+
+    /* 詳細ページ */
+    .detail-view {
+      background: var(--card);
+      border-radius: 32px;
+      padding: 24px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .detail-img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      border-radius: 24px;
+      margin: 16px 0;
+    }
+    .back-btn { margin: 20px 0 10px; }
+
+    /* リスト（周辺島） */
+    .island-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 500px;
+      margin: 20px auto;
+    }
+    .list-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 60px;
+      padding: 14px 20px;
+      text-align: center;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    footer p { margin: 8px 0; }
+    footer a { color: var(--text-light); text-decoration: none; }
+    hr { border-color: var(--border); margin: 20px 0; }
   </style>
 </head>
 <body class="dark">
-  <header>
-    <h1 id="main-title">🌊 Yaeyama & Miyako Islands</h1>
-    <div class="toolbar">
-      <button class="theme-btn" id="themeToggle">🌓 Dark/Light</button>
-      <button class="lang-btn" id="langEN">🇬🇧 EN</button>
-      <button class="lang-btn" id="langIT">🇮🇹 IT</button>
-      <button class="lang-btn" id="langRU">🇷🇺 RU</button>
-      <button class="lang-btn" id="langJA">🇯🇵 JA</button>
-      <button class="install-btn" id="installApp" style="display:none;">📲 Install App</button>
-    </div>
-  </header>
 
-  <div class="sponsor-area" id="sponsorTop">
-    <div class="sponsor-content" id="sponsorContentTop"><span>✨ Sponsor space ✨</span></div>
+<header>
+  <h1 id="mainTitle">🌊 Yaeyama & Miyako Islands</h1>
+  <div class="toolbar">
+    <button id="themeBtn">🌓 Dark/Light</button>
+    <button id="langEn">🇬🇧 EN</button>
+    <button id="langIt">🇮🇹 IT</button>
+    <button id="langRu">🇷🇺 RU</button>
+    <button id="langJa">🇯🇵 JA</button>
   </div>
+</header>
 
-  <main id="app"></main>
+<!-- スポンサー上部（コード変数で内容を設定） -->
+<div class="sponsor" id="sponsorTop"><!-- JSで埋める --></div>
 
-  <div class="sponsor-area" id="sponsorBottom">
-    <div class="sponsor-content" id="sponsorContentBottom"><span>✨ Sponsor space ✨</span></div>
-  </div>
+<main id="app"></main>
 
-  <footer><p>Contact us<br><a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a></p></footer>
+<!-- スポンサー下部 -->
+<div class="sponsor" id="sponsorBottom"><!-- JSで埋める --></div>
 
-  <script>
-    // ============================================================
-    // ★ 設定エリア（ここを編集）
-    // ============================================================
-    const SPONSOR_IMG_URL = "";      // 広告画像URL（空で非表示）
-    const SPONSOR_SITE_URL = "";     // 広告リンク先
-    const ISHIGAKI_MAP_URL = "";     // 石垣島地図iframe src
-    const MIYAKO_MAP_URL = "";       // 宮古島地図iframe src
-    // ============================================================
+<footer>
+  <p>Contact us</p>
+  <p><a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a></p>
+</footer>
 
-    // 多言語
-    const translations = {
-      en: { title: "🌊 Yaeyama & Miyako Islands", mainPageTitle: "Main Islands", backToMain: "← Back to Main", sponsorDefault: "✨ Sponsor space ✨", officialWebsite: "Official Website", detailsButton: "View Details →", noMap: "🗺️ Map not set. Edit code.", nearIslandsBtn: "🏝️ Nearby Islands (Yaeyama)", nearMiyakoBtn: "🏝️ Nearby Islands (Miyako)" },
-      it: { title: "🌊 Isole Yaeyama e Miyako", mainPageTitle: "Isole Principali", backToMain: "← Torna alla Home", sponsorDefault: "✨ Spazio Sponsor ✨", officialWebsite: "Sito Ufficiale", detailsButton: "Vedi Dettagli →", noMap: "🗺️ Mappa non impostata.", nearIslandsBtn: "🏝️ Isole vicine (Yaeyama)", nearMiyakoBtn: "🏝️ Isole vicine (Miyako)" },
-      ru: { title: "🌊 Острова Яэяма и Мияко", mainPageTitle: "Главные острова", backToMain: "← На главную", sponsorDefault: "✨ Место для спонсора ✨", officialWebsite: "Официальный сайт", detailsButton: "Подробнее →", noMap: "🗺️ Карта не задана.", nearIslandsBtn: "🏝️ Ближайшие острова (Яэяма)", nearMiyakoBtn: "🏝️ Ближайшие острова (Мияко)" },
-      ja: { title: "🌊 八重山・宮古諸島ガイド", mainPageTitle: "メイン島", backToMain: "← メインページへ戻る", sponsorDefault: "✨ スポンサー枠 ✨", officialWebsite: "公式サイト", detailsButton: "詳細を見る →", noMap: "🗺️ 地図未設定", nearIslandsBtn: "🏝️ 石垣島周辺の島々（八重山）", nearMiyakoBtn: "🏝️ 宮古島周辺の島々" }
-    };
-    let currentLang = "en";
-
-    // 島データ（簡略化のため省略、元のコードと同じ構造）
-    const mainIslandsDetails = {
-      ishigaki: { id:"ishigaki", name:{en:"Ishigaki Island",ja:"石垣島",it:"Ishigaki",ru:"Исигаки"}, image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Ishigaki_island_NASA.jpg/640px-Ishigaki_island_NASA.jpg", description:{en:"Gateway to Yaeyama.",ja:"八重山の玄関口。"}, access:{en:"Flights from Tokyo."}, sights:{en:"Kabira Bay."}, tips:{en:"Rent a car."}, official:"https://visitokinawa.jp/", group:"yaeyama" },
-      miyakoMain: { id:"miyakoMain", name:{en:"Miyako Island",ja:"宮古島",it:"Miyako",ru:"Мияко"}, image:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Miyakojima_Island_NASA.jpg/640px-Miyakojima_Island_NASA.jpg", description:{en:"Coral paradise.",ja:"サンゴ礁の楽園。"}, access:{en:"Direct flights."}, sights:{en:"Maehama Beach."}, tips:{en:"Snorkeling."}, official:"https://www.miyakotravel.jp/", group:"miyako" }
-    };
-    const islandsData = {
-      yaeyama: { name:{en:"Nearby Islands of Ishigaki",ja:"石垣島周辺の島々"}, subIslands:[{id:"iriomote",nameEn:"Iriomote",nameJa:"西表島"},{id:"taketomi",nameEn:"Taketomi",nameJa:"竹富島"},{id:"kohama",nameEn:"Kohama",nameJa:"小浜島"},{id:"kuro",nameEn:"Kuro",nameJa:"黒島"},{id:"hatoma",nameEn:"Hatoma",nameJa:"鳩間島"}] },
-      miyako: { name:{en:"Nearby Islands of Miyako",ja:"宮古島周辺の島々"}, subIslands:[{id:"irrabu",nameEn:"Irabu",nameJa:"伊良部島"},{id:"shimoji",nameEn:"Shimoji",nameJa:"下地島"},{id:"ikema",nameEn:"Ikema",nameJa:"池間島"},{id:"kurima",nameEn:"Kurima",nameJa:"来間島"}] }
-    };
-    const detailsContent = {
-      ishigaki: mainIslandsDetails.ishigaki, miyakoMain: mainIslandsDetails.miyakoMain,
-      iriomote: { image:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Iriomote_Island_View.jpg/640px-Iriomote_Island_View.jpg", description:{en:"Jungle and wild cat."}, access:{en:"30min boat."}, sights:{en:"Pinaisara Falls."}, tips:{en:"Insect repellent."}, official:"#" },
-      taketomi: { image:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Taketomi_Island_buffalo_cart.jpg/640px-Taketomi_Island_buffalo_cart.jpg", description:{en:"Water buffalo carts."}, access:{en:"15min ferry."}, sights:{en:"Kondoi Beach."}, tips:{en:"Rent a bike."}, official:"#" },
-      kohama: { image:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Kohama_Island_01.jpg", description:{en:"Sugarcane fields."}, access:{en:"25min ferry."}, sights:{en:"Sugar Road."}, tips:{en:"Cycling."}, official:"#" },
-      kuro: { image:"https://upload.wikimedia.org/wikipedia/commons/0/0f/Kuroshima_Island_-_pasture.jpg", description:{en:"Cows and stars."}, access:{en:"25min ferry."}, sights:{en:"Aiyaruhama Beach."}, tips:{en:"Ebike."}, official:"#" },
-      hatoma: { image:"https://upload.wikimedia.org/wikipedia/commons/9/95/Hatoma_Island.jpg", description:{en:"Tiny remote island."}, access:{en:"40min ferry."}, sights:{en:"Hatoma Beach."}, tips:{en:"No store."}, official:"#" },
-      irrabu: { image:"https://upload.wikimedia.org/wikipedia/commons/f/fb/Irabu_Ohashi_Bridge.jpg", description:{en:"Irabu Bridge views."}, access:{en:"Drive from Miyako."}, sights:{en:"Toguchi Beach."}, tips:{en:"Sunset drive."}, official:"#" },
-      shimoji: { image:"https://upload.wikimedia.org/wikipedia/commons/0/0c/Shimoji_Island_airport.jpg", description:{en:"Clear waters."}, access:{en:"Via Irabu."}, sights:{en:"Toriike Pond."}, tips:{en:"Snorkeling gear."}, official:"#" },
-      ikema: { image:"https://upload.wikimedia.org/wikipedia/commons/8/87/Ikema_Island_Ohashi.jpg", description:{en:"Pastoral landscape."}, access:{en:"Ikema Bridge."}, sights:{en:"Ikema Beach."}, tips:{en:"E-bike."}, official:"#" },
-      kurima: { image:"https://upload.wikimedia.org/wikipedia/commons/6/6a/Kurima_Bridge.jpg", description:{en:"Panoramic views."}, access:{en:"Kurima Bridge."}, sights:{en:"Kurima Beach."}, tips:{en:"Walking."}, official:"#" }
-    };
-
-    function t(key) { return translations[currentLang][key] || key; }
-    function getName(obj, fallback) { return obj[currentLang] || obj.en || fallback; }
-
-    let currentView = "main", currentGroup = null, currentDetailId = null, deferredPrompt;
-
-    function render() {
-      const app = document.getElementById("app");
-      if (currentView === "main") {
-        app.innerHTML = `
-          <h2 style="text-align:center">${t("mainPageTitle")}</h2>
-          <div class="card-grid">
-            <div class="card" data-detail="ishigaki">
-              <h3>${getName(mainIslandsDetails.ishigaki.name, "Ishigaki")}</h3>
-              <img class="main-island-img" src="${mainIslandsDetails.ishigaki.image}" onerror="this.src='https://placehold.co/600x300?text=Ishigaki'">
-              <p>${getName(mainIslandsDetails.ishigaki.description, "")}</p>
-              <div class="map-preview">${ISHIGAKI_MAP_URL ? `<iframe src="${ISHIGAKI_MAP_URL}"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}</div>
-              <a href="${mainIslandsDetails.ishigaki.official}" target="_blank" class="official-btn" onclick="event.stopPropagation()">${t("officialWebsite")}</a>
-              <button class="detail-btn">${t("detailsButton")}</button>
-            </div>
-            <div class="card" data-detail="miyakoMain">
-              <h3>${getName(mainIslandsDetails.miyakoMain.name, "Miyako")}</h3>
-              <img class="main-island-img" src="${mainIslandsDetails.miyakoMain.image}" onerror="this.src='https://placehold.co/600x300?text=Miyako'">
-              <p>${getName(mainIslandsDetails.miyakoMain.description, "")}</p>
-              <div class="map-preview">${MIYAKO_MAP_URL ? `<iframe src="${MIYAKO_MAP_URL}"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}</div>
-              <a href="${mainIslandsDetails.miyakoMain.official}" target="_blank" class="official-btn" onclick="event.stopPropagation()">${t("officialWebsite")}</a>
-              <button class="detail-btn">${t("detailsButton")}</button>
-            </div>
-          </div>
-          <div class="button-group">
-            <button id="gotoYaeyamaGroup" class="group-btn">${t("nearIslandsBtn")}</button>
-            <button id="gotoMiyakoGroup" class="group-btn">${t("nearMiyakoBtn")}</button>
-          </div>
-        `;
-        document.querySelectorAll(".card").forEach(card => {
-          const detailId = card.dataset.detail;
-          const gotoDetail = () => { currentDetailId = detailId; currentView = "detail"; render(); };
-          card.addEventListener("click", gotoDetail);
-          card.querySelector(".detail-btn")?.addEventListener("click", (e) => { e.stopPropagation(); gotoDetail(); });
-        });
-        document.getElementById("gotoYaeyamaGroup")?.addEventListener("click", () => { currentGroup = "yaeyama"; currentView = "group"; render(); });
-        document.getElementById("gotoMiyakoGroup")?.addEventListener("click", () => { currentGroup = "miyako"; currentView = "group"; render(); });
-      } else if (currentView === "group") {
-        const group = islandsData[currentGroup];
-        app.innerHTML = `<button class="back-btn" id="backMainFromGroup">← ${t("backToMain")}</button><h2 style="text-align:center">${getName(group.name, currentGroup)}</h2><div class="island-list">${group.subIslands.map(sub => `<div class="list-item" data-id="${sub.id}">${getName({ en: sub.nameEn, ja: sub.nameJa }, sub.id)}</div>`).join('')}</div>`;
-        document.getElementById("backMainFromGroup")?.addEventListener("click", () => { currentView = "main"; render(); });
-        document.querySelectorAll(".list-item").forEach(el => { el.addEventListener("click", () => { currentDetailId = el.dataset.id; currentView = "detail"; render(); }); });
-      } else if (currentView === "detail") {
-        const d = detailsContent[currentDetailId];
-        if (!d) { currentView = "main"; render(); return; }
-        app.innerHTML = `<div class="detail-view"><button class="back-btn" id="backMainFromDetail">← ${t("backToMain")}</button><h2>${getName(d.name || { en: currentDetailId }, currentDetailId)}</h2><img class="detail-img" src="${d.image}" onerror="this.src='https://placehold.co/600x300'"><p><strong>📖 Description:</strong> ${d.description?.[currentLang] || d.description?.en || ""}</p><p><strong>🚢 Access:</strong> ${d.access?.[currentLang] || d.access?.en || ""}</p><p><strong>🏖️ Sights:</strong> ${d.sights?.[currentLang] || d.sights?.en || ""}</p><p><strong>💡 Tips:</strong> ${d.tips?.[currentLang] || d.tips?.en || ""}</p><p><strong>🔗 Official:</strong> <a href="${d.official || "#"}" target="_blank">${d.official || "#"}</a></p><button class="back-btn" id="backMainFromDetailBottom">← ${t("backToMain")}</button></div>`;
-        const goMain = () => { currentView = "main"; render(); };
-        document.getElementById("backMainFromDetail")?.addEventListener("click", goMain);
-        document.getElementById("backMainFromDetailBottom")?.addEventListener("click", goMain);
-      }
-      updateSponsorDisplay();
-      document.getElementById("main-title").innerText = t("title");
+<script>
+  // ============================================================
+  // ★ 設定エリア（ここを書き換えてください） ★
+  // ============================================================
+  
+  // スポンサー画像URL（空文字で非表示）とリンク先URL
+  const SPONSOR_IMG_URL = "";      // 例: "https://example.com/sponsor.jpg"
+  const SPONSOR_LINK_URL = "";     // 例: "https://example.com"
+  
+  // 石垣島の地図埋め込みURL（iframeのsrcに指定するURL）
+  // Googleマップの「共有」→「地図を埋め込む」で取得したsrcをコピー
+  const ISHIGAKI_MAP_URL = "";     // 例: "https://www.google.com/maps/embed?pb=..."
+  
+  // 宮古島の地図埋め込みURL
+  const MIYAKO_MAP_URL = "";        // 例: "https://www.google.com/maps/embed?pb=..."
+  
+  // ============================================================
+  // ここより下は編集不要（動作に必要なコード）
+  // ============================================================
+  
+  // ---------- 多言語テキスト ----------
+  const texts = {
+    en: {
+      title: "🌊 Yaeyama & Miyako Islands",
+      mainTitle: "Main Islands",
+      back: "← Back to Main",
+      details: "View Details →",
+      official: "Official Website",
+      noMap: "🗺️ Map URL not set (edit code)",
+      sponsorDefault: "✨ Sponsor Space ✨<br><small>Edit SPONSOR_IMG_URL and SPONSOR_LINK_URL</small>",
+      nearbyYaeyama: "🏝️ Nearby Islands (Yaeyama)",
+      nearbyMiyako: "🏝️ Nearby Islands (Miyako)"
+    },
+    it: {
+      title: "🌊 Isole Yaeyama e Miyako",
+      mainTitle: "Isole Principali",
+      back: "← Torna alla Home",
+      details: "Vedi Dettagli →",
+      official: "Sito Ufficiale",
+      noMap: "🗺️ Mappa non impostata (modifica codice)",
+      sponsorDefault: "✨ Spazio Sponsor ✨<br><small>Modifica SPONSOR_IMG_URL e SPONSOR_LINK_URL</small>",
+      nearbyYaeyama: "🏝️ Isole vicine (Yaeyama)",
+      nearbyMiyako: "🏝️ Isole vicine (Miyako)"
+    },
+    ru: {
+      title: "🌊 Острова Яэяма и Мияко",
+      mainTitle: "Главные острова",
+      back: "← На главную",
+      details: "Подробнее →",
+      official: "Официальный сайт",
+      noMap: "🗺️ URL карты не задан (редактировать код)",
+      sponsorDefault: "✨ Место для спонсора ✨<br><small>Измените SPONSOR_IMG_URL и SPONSOR_LINK_URL</small>",
+      nearbyYaeyama: "🏝️ Ближайшие острова (Яэяма)",
+      nearbyMiyako: "🏝️ Ближайшие острова (Мияко)"
+    },
+    ja: {
+      title: "🌊 八重山・宮古諸島ガイド",
+      mainTitle: "メイン島",
+      back: "← メインページへ戻る",
+      details: "詳細を見る →",
+      official: "公式サイト",
+      noMap: "🗺️ 地図URL未設定（コードを編集）",
+      sponsorDefault: "✨ スポンサー枠 ✨<br><small>SPONSOR_IMG_URLとSPONSOR_LINK_URLを編集</small>",
+      nearbyYaeyama: "🏝️ 石垣島周辺の島々（八重山）",
+      nearbyMiyako: "🏝️ 宮古島周辺の島々"
     }
-
-    function updateSponsorDisplay() {
-      const hasSponsor = SPONSOR_IMG_URL && SPONSOR_SITE_URL;
-      document.getElementById("sponsorContentTop").innerHTML = hasSponsor ? `<img class="sponsor-img" src="${SPONSOR_IMG_URL}"><br><a class="sponsor-link" href="${SPONSOR_SITE_URL}" target="_blank">${SPONSOR_SITE_URL}</a>` : `<span>${t("sponsorDefault")}<br><small>Edit SPONSOR_IMG_URL and SPONSOR_SITE_URL</small></span>`;
-      document.getElementById("sponsorContentBottom").innerHTML = hasSponsor ? `<img class="sponsor-img" src="${SPONSOR_IMG_URL}"><br><a class="sponsor-link" href="${SPONSOR_SITE_URL}" target="_blank">Visit Sponsor</a>` : `<span>${t("sponsorDefault")}</span>`;
+  };
+  
+  let lang = "en";
+  function t(key) { return texts[lang][key] || key; }
+  
+  // ---------- 島データ ----------
+  const islands = {
+    ishigaki: {
+      id: "ishigaki",
+      name: { en: "Ishigaki Island", it: "Ishigaki", ru: "Исигаки", ja: "石垣島" },
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Ishigaki_island_NASA.jpg/640px-Ishigaki_island_NASA.jpg",
+      desc: { en: "Gateway to Yaeyama, beautiful beaches and mountains.", it: "Porta d'ingresso alle Yaeyama.", ru: "Ворота на Яэяму.", ja: "八重山の玄関口、美しいビーチ。" },
+      access: { en: "Direct flights from Tokyo/Osaka/Nagoya.", it: "Voli diretti da Tokyo/Osaka.", ru: "Прямые рейсы.", ja: "東京・大阪・名古屋から直行便。" },
+      sights: { en: "Kabira Bay, Mt. Nosoko", it: "Baia Kabira", ru: "Бухта Кабира", ja: "川平湾、野底岳" },
+      tips: { en: "Rent a car recommended.", it: "Noleggia un'auto.", ru: "Арендуйте машину.", ja: "レンタカーが便利。" },
+      official: "https://visitokinawa.jp/",
+      group: "yaeyama"
+    },
+    miyako: {
+      id: "miyako",
+      name: { en: "Miyako Island", it: "Miyako", ru: "Мияко", ja: "宮古島" },
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Miyakojima_Island_NASA.jpg/640px-Miyakojima_Island_NASA.jpg",
+      desc: { en: "Coral reef paradise, crystal clear water.", it: "Paradiso della barriera corallina.", ru: "Рай с коралловыми рифами.", ja: "サンゴ礁の楽園、透き通る海。" },
+      access: { en: "Direct flights from major cities.", it: "Voli diretti.", ru: "Прямые рейсы.", ja: "主要都市から直行便。" },
+      sights: { en: "Yonaha Maehama Beach, Cape Higashi-Hennazaki", it: "Spiaggia Yonaha Maehama", ru: "Пляж Ёнаха Маэхама", ja: "与那覇前浜ビーチ、東平安名崎" },
+      tips: { en: "Snorkeling and stargazing.", it: "Snorkeling e stelle.", ru: "Снорклинг и звёзды.", ja: "シュノーケリングと星空観測。" },
+      official: "https://www.miyakotravel.jp/",
+      group: "miyako"
     }
-
-    function setLang(lang) { currentLang = lang; render(); }
-    document.getElementById("langEN")?.addEventListener("click", () => setLang("en"));
-    document.getElementById("langIT")?.addEventListener("click", () => setLang("it"));
-    document.getElementById("langRU")?.addEventListener("click", () => setLang("ru"));
-    document.getElementById("langJA")?.addEventListener("click", () => setLang("ja"));
-
-    const body = document.body;
-    if (localStorage.getItem("theme") === "light") { body.classList.remove("dark"); body.classList.add("light"); }
-    else body.classList.add("dark");
-    document.getElementById("themeToggle")?.addEventListener("click", () => {
-      if (body.classList.contains("dark")) { body.classList.remove("dark"); body.classList.add("light"); localStorage.setItem("theme", "light"); }
-      else { body.classList.remove("light"); body.classList.add("dark"); localStorage.setItem("theme", "dark"); }
-    });
-
-    // PWA インストール ー 完全に動作保証する処理
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const installBtn = document.getElementById("installApp");
-      if (installBtn) {
-        installBtn.style.display = "inline-flex";
-        installBtn.onclick = async () => {
-          installBtn.style.display = "none";
-          if (deferredPrompt) {
-            await deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            deferredPrompt = null;
-          }
-        };
-      }
-      console.log("✅ beforeinstallprompt fired - PWA installable");
-    });
-    
-    window.addEventListener("appinstalled", () => {
-      console.log("✅ App installed successfully");
-      const installBtn = document.getElementById("installApp");
-      if (installBtn) installBtn.style.display = "none";
-    });
-
-    // Service Worker 登録（確実に）
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").then(reg => {
-          console.log("✅ Service Worker registered with scope:", reg.scope);
-        }).catch(err => {
-          console.error("❌ Service Worker registration failed:", err);
-        });
+  };
+  
+  // 周辺島（簡易データ）
+  const nearby = {
+    yaeyama: {
+      name: { en: "Nearby Islands of Ishigaki", it: "Isole vicine a Ishigaki", ru: "Ближайшие острова Исигаки", ja: "石垣島周辺の島々" },
+      list: [
+        { id: "iriomote", nameEn: "Iriomote", nameJa: "西表島", nameIt: "Iriomote", nameRu: "Ириомоте",
+          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Iriomote_Island_View.jpg/640px-Iriomote_Island_View.jpg",
+          descEn: "Jungle, Iriomote wild cat, kayaking.", descJa: "マングローブカヤック、西表山猫。", official: "#" },
+        { id: "taketomi", nameEn: "Taketomi", nameJa: "竹富島", nameIt: "Taketomi", nameRu: "Такетоми",
+          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Taketomi_Island_buffalo_cart.jpg/640px-Taketomi_Island_buffalo_cart.jpg",
+          descEn: "Water buffalo carts, traditional village.", descJa: "水牛車、赤瓦の集落。", official: "#" },
+        { id: "kohama", nameEn: "Kohama", nameJa: "小浜島", nameIt: "Kohama", nameRu: "Кохама",
+          image: "https://upload.wikimedia.org/wikipedia/commons/1/1f/Kohama_Island_01.jpg",
+          descEn: "Sugarcane fields, relaxing.", descJa: "サトウキビ畑、のどかな島。", official: "#" }
+      ]
+    },
+    miyako: {
+      name: { en: "Nearby Islands of Miyako", it: "Isole vicine a Miyako", ru: "Ближайшие острова Мияко", ja: "宮古島周辺の島々" },
+      list: [
+        { id: "irrabu", nameEn: "Irabu", nameJa: "伊良部島", nameIt: "Irabu", nameRu: "Ирабу",
+          image: "https://upload.wikimedia.org/wikipedia/commons/f/fb/Irabu_Ohashi_Bridge.jpg",
+          descEn: "Irabu Bridge, stunning ocean views.", descJa: "伊良部大橋、絶景。", official: "#" },
+        { id: "shimoji", nameEn: "Shimoji", nameJa: "下地島", nameIt: "Shimoji", nameRu: "Симодзи",
+          image: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Shimoji_Island_airport.jpg",
+          descEn: "Clear waters, aircraft spotting.", descJa: "透明度抜群、飛行機展望。", official: "#" }
+      ]
+    }
+  };
+  
+  // 現在の画面状態
+  let currentView = "main";
+  let currentGroup = null;
+  let currentDetailId = null;
+  
+  // ヘルパー
+  function getName(obj, fallback) { return obj[lang] || obj.en || fallback; }
+  
+  // スポンサー表示更新
+  function updateSponsors() {
+    const hasSponsor = SPONSOR_IMG_URL && SPONSOR_LINK_URL;
+    const content = hasSponsor 
+      ? `<img src="${SPONSOR_IMG_URL}" alt="sponsor"><br><a href="${SPONSOR_LINK_URL}" target="_blank" rel="noopener">${SPONSOR_LINK_URL}</a>`
+      : t("sponsorDefault");
+    document.getElementById("sponsorTop").innerHTML = content;
+    document.getElementById("sponsorBottom").innerHTML = content;
+  }
+  
+  // メインページ描画
+  function renderMain() {
+    const app = document.getElementById("app");
+    app.innerHTML = `
+      <h2>${t("mainTitle")}</h2>
+      <div class="card-grid">
+        <div class="card" data-id="ishigaki">
+          <h3>${getName(islands.ishigaki.name, "Ishigaki")}</h3>
+          <img class="card-img" src="${islands.ishigaki.image}" onerror="this.src='https://placehold.co/600x300'">
+          <p>${getName(islands.ishigaki.desc, "")}</p>
+          <div class="map">
+            ${ISHIGAKI_MAP_URL ? `<iframe src="${ISHIGAKI_MAP_URL}" title="Ishigaki Map" loading="lazy"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}
+          </div>
+          <a href="${islands.ishigaki.official}" target="_blank" class="official-btn" style="display:inline-block; background:#2c6e9e; color:white; padding:6px 12px; border-radius:40px; text-decoration:none; margin-top:8px;">${t("official")}</a>
+          <button class="detail-btn" style="margin-top:12px; width:100%;">${t("details")}</button>
+        </div>
+        <div class="card" data-id="miyako">
+          <h3>${getName(islands.miyako.name, "Miyako")}</h3>
+          <img class="card-img" src="${islands.miyako.image}" onerror="this.src='https://placehold.co/600x300'">
+          <p>${getName(islands.miyako.desc, "")}</p>
+          <div class="map">
+            ${MIYAKO_MAP_URL ? `<iframe src="${MIYAKO_MAP_URL}" title="Miyako Map" loading="lazy"></iframe>` : `<div class="map-placeholder">${t("noMap")}</div>`}
+          </div>
+          <a href="${islands.miyako.official}" target="_blank" class="official-btn" style="display:inline-block; background:#2c6e9e; color:white; padding:6px 12px; border-radius:40px; text-decoration:none; margin-top:8px;">${t("official")}</a>
+          <button class="detail-btn" style="margin-top:12px; width:100%;">${t("details")}</button>
+        </div>
+      </div>
+      <hr>
+      <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin:20px 0;">
+        <button id="gotoYaeyama" class="group-btn">${t("nearbyYaeyama")}</button>
+        <button id="gotoMiyako" class="group-btn">${t("nearbyMiyako")}</button>
+      </div>
+    `;
+    // カードクリックで詳細へ
+    document.querySelectorAll(".card").forEach(card => {
+      const id = card.dataset.id;
+      card.addEventListener("click", (e) => {
+        if (e.target.tagName === 'A' || e.target.classList.contains('official-btn')) return;
+        currentDetailId = id;
+        currentView = "detail";
+        render();
       });
+      card.querySelector(".detail-btn")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        currentDetailId = id;
+        currentView = "detail";
+        render();
+      });
+    });
+    document.getElementById("gotoYaeyama")?.addEventListener("click", () => { currentGroup = "yaeyama"; currentView = "group"; render(); });
+    document.getElementById("gotoMiyako")?.addEventListener("click", () => { currentGroup = "miyako"; currentView = "group"; render(); });
+  }
+  
+  // 周辺島グループ表示
+  function renderGroup() {
+    const group = nearby[currentGroup];
+    if (!group) { currentView = "main"; render(); return; }
+    const app = document.getElementById("app");
+    app.innerHTML = `
+      <button class="back-btn" id="backToMain">← ${t("back")}</button>
+      <h2 style="text-align:center">${getName(group.name)}</h2>
+      <div class="island-list">
+        ${group.list.map(sub => `<div class="list-item" data-id="${sub.id}">${getName({ en: sub.nameEn, ja: sub.nameJa, it: sub.nameIt, ru: sub.nameRu }, sub.id)}</div>`).join('')}
+      </div>
+    `;
+    document.getElementById("backToMain")?.addEventListener("click", () => { currentView = "main"; render(); });
+    document.querySelectorAll(".list-item").forEach(el => {
+      el.addEventListener("click", () => {
+        const subId = el.dataset.id;
+        const found = [...nearby.yaeyama.list, ...nearby.miyako.list].find(i => i.id === subId);
+        if (found) {
+          // 詳細用に一時オブジェクトを作成
+          window.tempDetail = {
+            name: { en: found.nameEn, ja: found.nameJa, it: found.nameIt, ru: found.nameRu },
+            image: found.image,
+            desc: { en: found.descEn, ja: found.descJa, it: found.descEn, ru: found.descEn }, // 簡易
+            official: found.official
+          };
+          currentDetailId = subId;
+          currentView = "detail";
+          render();
+        }
+      });
+    });
+  }
+  
+  // 詳細ページ
+  function renderDetail() {
+    let data;
+    if (currentDetailId === "ishigaki") data = islands.ishigaki;
+    else if (currentDetailId === "miyako") data = islands.miyako;
+    else data = window.tempDetail;
+    if (!data) { currentView = "main"; render(); return; }
+    const app = document.getElementById("app");
+    app.innerHTML = `
+      <div class="detail-view">
+        <button class="back-btn" id="detailBack">← ${t("back")}</button>
+        <h2>${getName(data.name)}</h2>
+        <img class="detail-img" src="${data.image}" onerror="this.src='https://placehold.co/600x300'">
+        <p><strong>📖 Description:</strong> ${getName(data.desc)}</p>
+        ${data.access ? `<p><strong>🚢 Access:</strong> ${getName(data.access)}</p>` : ''}
+        ${data.sights ? `<p><strong>🏖️ Sights:</strong> ${getName(data.sights)}</p>` : ''}
+        ${data.tips ? `<p><strong>💡 Tips:</strong> ${getName(data.tips)}</p>` : ''}
+        <p><strong>🔗 Official:</strong> <a href="${data.official}" target="_blank">${data.official}</a></p>
+        <button class="back-btn" id="detailBack2">← ${t("back")}</button>
+      </div>
+    `;
+    const goBack = () => { currentView = "main"; render(); };
+    document.getElementById("detailBack")?.addEventListener("click", goBack);
+    document.getElementById("detailBack2")?.addEventListener("click", goBack);
+  }
+  
+  function render() {
+    updateSponsors();
+    document.getElementById("mainTitle").innerText = t("title");
+    if (currentView === "main") renderMain();
+    else if (currentView === "group") renderGroup();
+    else if (currentView === "detail") renderDetail();
+  }
+  
+  // 言語切り替え
+  function setLang(l) { lang = l; render(); }
+  document.getElementById("langEn")?.addEventListener("click", () => setLang("en"));
+  document.getElementById("langIt")?.addEventListener("click", () => setLang("it"));
+  document.getElementById("langRu")?.addEventListener("click", () => setLang("ru"));
+  document.getElementById("langJa")?.addEventListener("click", () => setLang("ja"));
+  
+  // テーマ切り替え（ダークデフォルト）
+  const body = document.body;
+  if (localStorage.getItem("theme") === "light") body.classList.remove("dark"), body.classList.add("light");
+  else body.classList.add("dark");
+  document.getElementById("themeBtn")?.addEventListener("click", () => {
+    if (body.classList.contains("dark")) {
+      body.classList.remove("dark"); body.classList.add("light");
+      localStorage.setItem("theme", "light");
     } else {
-      console.warn("⚠️ Service Worker not supported");
+      body.classList.remove("light"); body.classList.add("dark");
+      localStorage.setItem("theme", "dark");
     }
-
-    // インストール条件をチェック（デバッグ）
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      console.log("✅ App running in standalone (installed) mode");
-    } else {
-      console.log("ℹ️ App running in browser. Check: HTTPS? Valid manifest? SW registered? User engagement?");
-    }
-
-    render();
-  </script>
+  });
+  
+  // PWA インストール
+  let deferredPrompt;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = document.createElement("button");
+    btn.textContent = "📲 Install App";
+    btn.className = "install-btn";
+    btn.style.cssText = "background:#2c6e9e; color:white; border:none; padding:6px 12px; border-radius:40px; margin-left:10px; cursor:pointer;";
+    btn.onclick = async () => {
+      btn.remove();
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      }
+    };
+    document.querySelector(".toolbar")?.appendChild(btn);
+  });
+  
+  // Service Worker
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").then(reg => console.log("SW registered", reg)).catch(err => console.log("SW failed", err));
+    });
+  }
+  
+  render();
+</script>
 </body>
 </html>
