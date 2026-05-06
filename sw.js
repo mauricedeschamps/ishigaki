@@ -1,30 +1,22 @@
-const CACHE_NAME = 'island-guide-v7';
+const CACHE_NAME = 'island-guide-v1';
 const urlsToCache = [
-  '/',
+  '.',
   'index.html',
-  'manifest.json'
+  'manifest.json',
+  'icons/icon-192.jpg',
+  'icons/icon-512.jpg'
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
   self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request).then(fetchRes => {
-        if (fetchRes && fetchRes.status === 200 && event.request.method === 'GET') {
-          const clone = fetchRes.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return fetchRes;
-      });
-    }).catch(() => caches.match('./index.html'))
+    caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
 
