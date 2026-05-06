@@ -339,6 +339,20 @@
 
   function getName(obj, fallback) { return obj[lang] || obj.en || fallback; }
 
+  // ★ 周辺島用のテキスト取得ヘルパー
+  function getNearbyText(item, field) {
+    if (!item) return "";
+    const fieldMap = {
+      desc: { en: item.descEn, ja: item.descJa, it: item.descIt, ru: item.descRu },
+      access: { en: item.accessEn, ja: item.accessJa, it: item.accessEn, ru: item.accessEn },
+      sights: { en: item.sightsEn, ja: item.sightsJa, it: item.sightsEn, ru: item.sightsEn },
+      tips: { en: item.tipsEn, ja: item.tipsJa, it: item.tipsEn, ru: item.tipsEn }
+    };
+    const target = fieldMap[field];
+    if (!target) return "";
+    return target[lang] || target.en || "";
+  }
+
   function updateSponsors() {
     const hasSponsor = SPONSOR_IMG_URL && SPONSOR_LINK_URL;
     const content = hasSponsor 
@@ -423,27 +437,48 @@
     });
   }
 
-  // 詳細ページ（メイン島・周辺島共通）
+  // 詳細ページ（メイン島・周辺島共通、修正版）
   function renderDetail() {
     let data;
-    if (currentDetailId === "ishigaki") data = mainIslands.ishigaki;
-    else if (currentDetailId === "miyako") data = mainIslands.miyako;
-    else data = window.tempDetail;
+    let isMain = false;
+    if (currentDetailId === "ishigaki") { data = mainIslands.ishigaki; isMain = true; }
+    else if (currentDetailId === "miyako") { data = mainIslands.miyako; isMain = true; }
+    else { data = window.tempDetail; isMain = false; }
     if (!data) { currentView = "main"; render(); return; }
 
-    const desc = data.desc ? getName(data.desc) : (data.descEn ? (lang === 'ja' ? data.descJa : data.descEn) : "");
-    const access = data.access ? getName(data.access) : (data.accessEn ? (lang === 'ja' ? data.accessJa : data.accessEn) : "");
-    const sights = data.sights ? getName(data.sights) : (data.sightsEn ? (lang === 'ja' ? data.sightsJa : data.sightsEn) : "");
-    const tips = data.tips ? getName(data.tips) : (data.tipsEn ? (lang === 'ja' ? data.tipsJa : data.tipsEn) : "");
-    const official = data.official || "#";
-    const img = data.image || "https://placehold.co/600x300";
+    let name = "";
+    let desc = "";
+    let access = "";
+    let sights = "";
+    let tips = "";
+    let official = "";
+    let image = "";
+
+    if (isMain) {
+      name = getName(data.name);
+      desc = getName(data.desc);
+      access = getName(data.access);
+      sights = getName(data.sights);
+      tips = getName(data.tips);
+      official = data.official;
+      image = data.image;
+    } else {
+      // 周辺島：フラットなプロパティから言語対応テキストを取得
+      name = getName({ en: data.nameEn, ja: data.nameJa, it: data.nameIt, ru: data.nameRu }, data.id);
+      desc = getNearbyText(data, "desc");
+      access = getNearbyText(data, "access");
+      sights = getNearbyText(data, "sights");
+      tips = getNearbyText(data, "tips");
+      official = data.official || "#";
+      image = data.image;
+    }
 
     const app = document.getElementById("app");
     app.innerHTML = `
       <div class="detail-view">
         <button class="back-btn" id="detailBack">← ${t("back")}</button>
-        <h2>${getName(data.name)}</h2>
-        <img class="detail-img" src="${img}" onerror="this.src='https://placehold.co/600x300'">
+        <h2>${name}</h2>
+        <img class="detail-img" src="${image}" onerror="this.src='https://placehold.co/600x300'">
         <p><strong>📖 Description:</strong> ${desc}</p>
         ${access ? `<p><strong>🚢 Access:</strong> ${access}</p>` : ''}
         ${sights ? `<p><strong>🏖️ Sights:</strong> ${sights}</p>` : ''}
