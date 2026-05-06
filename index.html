@@ -1,568 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Yaeyama & Miyako Guide</title>
-  
-  <!-- PWA + iPhone 対応 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>八重山・宮古諸島ガイド</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon-192.jpg">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#1e2a3a">
-  
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body.dark {
-      --bg: #121212;
-      --surface: #1e2a3a;
-      --text: #eef2f5;
-      --text-light: #b0c4de;
-      --border: #2d3e4e;
-      --card: #1e2a3a;
-      --btn: #2c6e9e;
-      --btn-hover: #1e4f73;
-    }
-    body.light {
-      --bg: #f5f7fa;
-      --surface: #ffffff;
-      --text: #1e2a3a;
-      --text-light: #2c3e50;
-      --border: #ccd7e4;
-      --card: #ffffff;
-      --btn: #2c6e9e;
-      --btn-hover: #1e4f73;
-    }
-
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.5;
-      padding: 16px;
-      transition: background 0.2s, color 0.2s;
-    }
-
-    header, footer {
-      background: var(--surface);
-      border-radius: 28px;
-      padding: 16px 20px;
-      margin: 16px 0;
-      border: 1px solid var(--border);
-    }
-
-    h1 { font-size: 1.8rem; margin-bottom: 8px; }
-    h2 { margin: 20px 0 12px; font-size: 1.4rem; }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    button {
-      background: var(--btn);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 40px;
-      color: white;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover { background: var(--btn-hover); }
-
-    .sponsor {
-      background: var(--surface);
-      border: 1px dashed var(--border);
-      border-radius: 24px;
-      padding: 16px;
-      margin: 20px 0;
-      text-align: center;
-    }
-    .sponsor img { max-height: 80px; max-width: 100%; border-radius: 12px; object-fit: contain; }
-    .sponsor a { color: #4a9eff; text-decoration: none; word-break: break-all; }
-
-    .card-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin: 20px 0;
+      font-family: system-ui, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 20px;
     }
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 28px;
+      background: white;
+      border-radius: 24px;
       padding: 20px;
-      width: 340px;
-      cursor: pointer;
-      transition: transform 0.2s;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .card:hover { transform: translateY(-5px); }
-    .card-img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      border-radius: 20px;
-      margin: 12px 0;
-    }
-    .card h3 { font-size: 1.4rem; }
-
-    .map {
-      margin: 16px 0;
+    img {
+      max-width: 100%;
       border-radius: 16px;
-      overflow: hidden;
-      background: var(--bg);
-      text-align: center;
+      display: block;
+      margin: 10px 0;
     }
-    .map-img {
-      width: 100%;
+    .map-img, .sponsor-img {
       max-height: 180px;
       object-fit: contain;
-      background: var(--surface);
     }
-    .map-placeholder {
-      background: var(--btn);
-      height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    button {
+      background: #2c6e9e;
       color: white;
-      font-size: 0.9rem;
-      text-align: center;
-      padding: 12px;
-      border-radius: 16px;
-    }
-
-    .detail-view {
-      background: var(--card);
-      border-radius: 32px;
-      padding: 24px;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    .detail-img {
-      width: 100%;
-      max-height: 300px;
-      object-fit: cover;
-      border-radius: 24px;
-      margin: 16px 0;
-    }
-    .back-btn { margin: 20px 0 10px; }
-
-    .island-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-width: 500px;
-      margin: 20px auto;
-    }
-    .list-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 60px;
-      padding: 14px 20px;
-      text-align: center;
-      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
       cursor: pointer;
     }
-    footer p { margin: 8px 0; }
-    footer a { color: var(--text-light); text-decoration: none; }
-    hr { border-color: var(--border); margin: 20px 0; }
+    .sponsor {
+      text-align: center;
+      background: #e9ecef;
+      border-radius: 20px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    hr {
+      margin: 20px 0;
+    }
   </style>
 </head>
-<body class="dark">
+<body>
 
-<header>
-  <h1 id="mainTitle">🌊 Yaeyama & Miyako Islands</h1>
-  <div class="toolbar">
-    <button id="themeBtn">🌓 Dark/Light</button>
-    <button id="langEn">🇬🇧 EN</button>
-    <button id="langIt">🇮🇹 IT</button>
-    <button id="langRu">🇷🇺 RU</button>
-    <button id="langJa">🇯🇵 JA</button>
-  </div>
-</header>
+<h1>🌊 八重山・宮古諸島ガイド</h1>
 
+<!-- スポンサー上部 -->
 <div class="sponsor" id="sponsorTop"></div>
-<main id="app"></main>
+
+<!-- 石垣島 -->
+<div class="card" id="ishigaki-card">
+  <h2>石垣島</h2>
+  <img id="ishigakiMainImg" src="" alt="石垣島メイン画像">
+  <p id="ishigakiDesc">八重山の玄関口、美しいビーチと山々。</p>
+  <div class="map">
+    <img id="ishigakiMap" class="map-img" src="" alt="石垣島地図">
+  </div>
+  <a id="ishigakiOfficial" href="#" target="_blank">公式サイト</a><br>
+  <button onclick="showDetail('ishigaki')">詳細を見る</button>
+</div>
+
+<!-- 宮古島 -->
+<div class="card" id="miyako-card">
+  <h2>宮古島</h2>
+  <img id="miyakoMainImg" src="" alt="宮古島メイン画像">
+  <p id="miyakoDesc">サンゴ礁の楽園、透き通る海。</p>
+  <div class="map">
+    <img id="miyakoMap" class="map-img" src="" alt="宮古島地図">
+  </div>
+  <a id="miyakoOfficial" href="#" target="_blank">公式サイト</a><br>
+  <button onclick="showDetail('miyako')">詳細を見る</button>
+</div>
+
+<!-- 周辺島へのリンク -->
+<div style="text-align:center; margin:20px 0;">
+  <button onclick="showNearby('yaeyama')">🏝️ 石垣島周辺の島々（八重山）</button>
+  <button onclick="showNearby('miyako')">🏝️ 宮古島周辺の島々</button>
+</div>
+
+<!-- 周辺島リスト表示エリア -->
+<div id="nearbyArea" style="display:none;"></div>
+
+<!-- 詳細表示エリア -->
+<div id="detailArea" style="display:none;"></div>
+
+<!-- スポンサー下部 -->
 <div class="sponsor" id="sponsorBottom"></div>
 
 <footer>
-  <p>Contact us</p>
-  <p><a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a></p>
+  <p>Contact us<br><a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a></p>
 </footer>
 
 <script>
-  // ============================================================
-  // ★ 設定エリア（ここを書き換えてください） ★
-  // ============================================================
-  // スポンサー画像URL（空文字で非表示）とリンク先URL
-  const SPONSOR_IMG_URL = "https://www.euglena.jp/wp_01/wp-content/uploads/2023/10/efd456796c829c131a17e6e6526cbc82.png";
-  const SPONSOR_LINK_URL = "https://www.euglena.jp/";
-  
-  // 石垣島の地図画像URL（地図のスクリーンショットなど、画像への直リンク）
-  const ISHIGAKI_MAP_URL = "https://www.samuraitours.com/wp-content/uploads/2020/05/e_top_map.gif";
-  
-  // 宮古島の地図画像URL
-  const MIYAKO_MAP_URL = "https://i0.wp.com/perfect47japan.com/wp-content/uploads/2023/06/Glory-Island-33.jpg?resize=1024%2C683&ssl=1";
-  // ============================================================
-
-  // ---------- 多言語 ----------
-  const texts = {
-    en: {
-      title: "🌊 Yaeyama & Miyako Islands", mainTitle: "Main Islands", back: "← Back to Main",
-      details: "View Details →", official: "Official Website", noMap: "🗺️ Map image not set (edit code)",
-      sponsorDefault: "✨ Sponsor Space ✨<br><small>Edit SPONSOR_IMG_URL and SPONSOR_LINK_URL</small>",
-      nearbyYaeyama: "🏝️ Nearby Islands (Yaeyama)", nearbyMiyako: "🏝️ Nearby Islands (Miyako)"
-    },
-    it: {
-      title: "🌊 Isole Yaeyama e Miyako", mainTitle: "Isole Principali", back: "← Torna alla Home",
-      details: "Vedi Dettagli →", official: "Sito Ufficiale", noMap: "🗺️ Immagine mappa non impostata (modifica codice)",
-      sponsorDefault: "✨ Spazio Sponsor ✨<br><small>Modifica SPONSOR_IMG_URL e SPONSOR_LINK_URL</small>",
-      nearbyYaeyama: "🏝️ Isole vicine (Yaeyama)", nearbyMiyako: "🏝️ Isole vicine (Miyako)"
-    },
-    ru: {
-      title: "🌊 Острова Яэяма и Мияко", mainTitle: "Главные острова", back: "← На главную",
-      details: "Подробнее →", official: "Официальный сайт", noMap: "🗺️ Изображение карты не задано (редактировать код)",
-      sponsorDefault: "✨ Место для спонсора ✨<br><small>Измените SPONSOR_IMG_URL и SPONSOR_LINK_URL</small>",
-      nearbyYaeyama: "🏝️ Ближайшие острова (Яэяма)", nearbyMiyako: "🏝️ Ближайшие острова (Мияко)"
-    },
-    ja: {
-      title: "🌊 八重山・宮古諸島ガイド", mainTitle: "メイン島", back: "← メインページへ戻る",
-      details: "詳細を見る →", official: "公式サイト", noMap: "🗺️ 地図画像が未設定（コードを編集）",
-      sponsorDefault: "✨ スポンサー枠 ✨<br><small>SPONSOR_IMG_URLとSPONSOR_LINK_URLを編集</small>",
-      nearbyYaeyama: "🏝️ 石垣島周辺の島々（八重山）", nearbyMiyako: "🏝️ 宮古島周辺の島々"
-    }
+  // =====================================================
+  // ★ あなたが設定するURL（ここだけ書き換えてください） ★
+  // =====================================================
+  const MY_URLS = {
+    // スポンサー
+    sponsorImg: "https://www.euglena.jp/wp_01/wp-content/uploads/2023/10/efd456796c829c131a17e6e6526cbc82.png",
+    sponsorLink: "https://www.euglena.jp/",
+    
+    // 石垣島
+    ishigakiMainImg: "https://ishigaki-tours.com/wp-content/uploads/2018/01/313-3.jpg",
+    ishigakiMapImg: "https://www.samuraitours.com/wp-content/uploads/2020/05/e_top_map.gif",
+    ishigakiOfficial: "https://visitokinawa.jp/",
+    
+    // 宮古島
+    miyakoMainImg: "https://www.veltra.com/jp/guide/wp-content/uploads/2023/10/pixta_39456562_M-min.jpg",
+    miyakoMapImg: "https://i0.wp.com/perfect47japan.com/wp-content/uploads/2023/06/Glory-Island-33.jpg?resize=1024%2C683&ssl=1",
+    miyakoOfficial: "https://www.miyakotravel.jp/"
   };
-  let lang = "en";
-  function t(key) { return texts[lang][key] || key; }
+  // =====================================================
 
-  // ---------- メイン島データ ----------
-  const mainIslands = {
-    ishigaki: {
-      id: "ishigaki",
-      name: { en: "Ishigaki Island", it: "Ishigaki", ru: "Исигаки", ja: "石垣島" },
-      image: "https://ishigaki-tours.com/wp-content/uploads/2018/01/313-3.jpg",
-      desc: { en: "Gateway to Yaeyama, beautiful beaches and mountains.", it: "Porta d'ingresso alle Yaeyama.", ru: "Ворота на Яэяму.", ja: "八重山の玄関口、美しいビーチ。" },
-      access: { en: "Direct flights from Tokyo/Osaka/Nagoya.", it: "Voli diretti da Tokyo/Osaka.", ru: "Прямые рейсы.", ja: "東京・大阪・名古屋から直行便。" },
-      sights: { en: "Kabira Bay, Mt. Nosoko, Yaima Village", it: "Baia Kabira, Monte Nosoko", ru: "Бухта Кабира, гора Носоко", ja: "川平湾、野底岳、やいま村" },
-      tips: { en: "Rent a car. Try Yaeyama soba.", it: "Noleggia un'auto. Prova gli Yaeyama soba.", ru: "Арендуйте машину. Попробуйте лапшу.", ja: "レンタカーが便利。八重山そばを試して。" },
-      official: "https://visitokinawa.jp/"
-    },
-    miyako: {
-      id: "miyako",
-      name: { en: "Miyako Island", it: "Miyako", ru: "Мияко", ja: "宮古島" },
-      image: "https://www.veltra.com/jp/guide/wp-content/uploads/2023/10/pixta_39456562_M-min.jpg",
-      desc: { en: "Coral reef paradise, crystal clear water.", it: "Paradiso della barriera corallina.", ru: "Рай с коралловыми рифами.", ja: "サンゴ礁の楽園、透き通る海。" },
-      access: { en: "Direct flights from major cities; bridges to nearby islands.", it: "Voli diretti; ponti verso isole vicine.", ru: "Прямые рейсы; мосты к соседним островам.", ja: "主要都市から直行便；橋で周辺島へ。" },
-      sights: { en: "Yonaha Maehama Beach, Cape Higashi-Hennazaki, Ikema Bridge", it: "Spiaggia Yonaha Maehama, Capo Higashi-Hennazaki", ru: "Пляж Ёнаха Маэхама, мыс Хигаси-Хэннадзаки", ja: "与那覇前浜ビーチ、東平安名崎、池間大橋" },
-      tips: { en: "Snorkeling and stargazing.", it: "Snorkeling e osservazione stelle.", ru: "Снорклинг и звёзды.", ja: "シュノーケリングと星空観測に最適。" },
-      official: "https://www.miyakotravel.jp/"
-    }
-  };
+  // ページ読み込み時に画像・リンクをセット
+  document.getElementById("sponsorTop").innerHTML = `<img src="${MY_URLS.sponsorImg}" style="max-height:80px"><br><a href="${MY_URLS.sponsorLink}" target="_blank">${MY_URLS.sponsorLink}</a>`;
+  document.getElementById("sponsorBottom").innerHTML = `<img src="${MY_URLS.sponsorImg}" style="max-height:80px"><br><a href="${MY_URLS.sponsorLink}" target="_blank">スポンサーサイトへ</a>`;
+  
+  document.getElementById("ishigakiMainImg").src = MY_URLS.ishigakiMainImg;
+  document.getElementById("ishigakiMap").src = MY_URLS.ishigakiMapImg;
+  document.getElementById("ishigakiOfficial").href = MY_URLS.ishigakiOfficial;
+  
+  document.getElementById("miyakoMainImg").src = MY_URLS.miyakoMainImg;
+  document.getElementById("miyakoMap").src = MY_URLS.miyakoMapImg;
+  document.getElementById("miyakoOfficial").href = MY_URLS.miyakoOfficial;
 
-  // ---------- 周辺島データ（完全版：八重山5島、宮古4島） ----------
-  const nearbyGroups = {
+  // 周辺島データ（シンプルに）
+  const nearbyData = {
     yaeyama: {
-      name: { en: "Nearby Islands of Ishigaki (Yaeyama)", it: "Isole vicine a Ishigaki (Yaeyama)", ru: "Ближайшие острова Исигаки (Яэяма)", ja: "石垣島周辺の島々（八重山）" },
+      title: "八重山諸島",
       list: [
-        { id: "iriomote", nameEn: "Iriomote", nameJa: "西表島", nameIt: "Iriomote", nameRu: "Ириомоте",
-          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Iriomote_Island_View.jpg/640px-Iriomote_Island_View.jpg",
-          descEn: "Lush jungle, Iriomote wild cat, kayaking.", descJa: "マングローブのカヤック、西表山猫で有名。", descIt: "Giungla lussureggiante, gatto selvatico.", descRu: "Пышные джунгли, дикая кошка.",
-          accessEn: "30 min high-speed boat from Ishigaki port.", accessJa: "石垣港から高速船で30分。",
-          sightsEn: "Pinaisara Falls, Hoshizuna Beach", sightsJa: "ピナイサーラの滝、星砂の浜",
-          tipsEn: "Insect repellent essential. Best season: spring/autumn.", tipsJa: "虫除け必須。春・秋がおすすめ。",
-          official: "https://visitokinawa.jp/" },
-        { id: "taketomi", nameEn: "Taketomi", nameJa: "竹富島", nameIt: "Taketomi", nameRu: "Такетоми",
-          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Taketomi_Island_buffalo_cart.jpg/640px-Taketomi_Island_buffalo_cart.jpg",
-          descEn: "Traditional Ryukyu village, water buffalo carts.", descJa: "水牛車と赤瓦の集落。", descIt: "Villaggio tradizionale Ryukyu, carri trainati da bufali.", descRu: "Традиционная деревня Рюкю, повозки с буйволами.",
-          accessEn: "10-15 min ferry from Ishigaki.", accessJa: "石垣港からフェリーで10〜15分。",
-          sightsEn: "Kondoi Beach, Star Sand", sightsJa: "コンドイビーチ、星砂",
-          tipsEn: "Rent a bike to explore.", tipsJa: "レンタル自転車が便利。",
-          official: "https://www.taketomi-island.jp/" },
-        { id: "kohama", nameEn: "Kohama", nameJa: "小浜島", nameIt: "Kohama", nameRu: "Кохама",
-          image: "https://upload.wikimedia.org/wikipedia/commons/1/1f/Kohama_Island_01.jpg",
-          descEn: "Relaxed island, sugarcane fields.", descJa: "のどかな島、サトウキビ畑。", descIt: "Isola tranquilla, campi di canna da zucchero.", descRu: "Спокойный остров, поля сахарного тростника.",
-          accessEn: "25 min ferry from Ishigaki.", accessJa: "石垣港から25分。",
-          sightsEn: "Sugar Road, Ufudachii", sightsJa: "シュガーロード、ウフダチィ",
-          tipsEn: "Great for cycling.", tipsJa: "サイクリングに最適。",
-          official: "#" },
-        { id: "kuro", nameEn: "Kuro", nameJa: "黒島", nameIt: "Kuro", nameRu: "Куро",
-          image: "https://upload.wikimedia.org/wikipedia/commons/0/0f/Kuroshima_Island_-_pasture.jpg",
-          descEn: "Famous for cows and starry sky.", descJa: "牛と星空の島。", descIt: "Famoso per mucche e cielo stellato.", descRu: "Знаменит коровами и звездами.",
-          accessEn: "25 min ferry.", accessJa: "石垣港から25分。",
-          sightsEn: "Aiyaruhama Beach.", sightsJa: "アイヤル浜",
-          tipsEn: "Rent an ebike.", tipsJa: "電動自転車推奨。",
-          official: "#" },
-        { id: "hatoma", nameEn: "Hatoma", nameJa: "鳩間島", nameIt: "Hatoma", nameRu: "Хатома",
-          image: "https://upload.wikimedia.org/wikipedia/commons/9/95/Hatoma_Island.jpg",
-          descEn: "Tiny remote island, beautiful sunset.", descJa: "小さな離島、絶景の夕日。", descIt: "Piccola remota, tramonto stupendo.", descRu: "Маленький отдаленный остров.",
-          accessEn: "40 min ferry.", accessJa: "石垣港から40分。",
-          sightsEn: "Hatoma Beach.", sightsJa: "鳩間ビーチ",
-          tipsEn: "No convenience store.", tipsJa: "コンビニなし。",
-          official: "#" }
+        { name: "西表島", desc: "マングローブカヤック、西表山猫。", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Iriomote_Island_View.jpg/640px-Iriomote_Island_View.jpg" },
+        { name: "竹富島", desc: "水牛車、赤瓦の集落。", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Taketomi_Island_buffalo_cart.jpg/640px-Taketomi_Island_buffalo_cart.jpg" },
+        { name: "小浜島", desc: "サトウキビ畑、のどかな島。", img: "https://upload.wikimedia.org/wikipedia/commons/1/1f/Kohama_Island_01.jpg" },
+        { name: "黒島", desc: "牛と星空の島。", img: "https://upload.wikimedia.org/wikipedia/commons/0/0f/Kuroshima_Island_-_pasture.jpg" },
+        { name: "鳩間島", desc: "小さな離島、絶景の夕日。", img: "https://upload.wikimedia.org/wikipedia/commons/9/95/Hatoma_Island.jpg" }
       ]
     },
     miyako: {
-      name: { en: "Nearby Islands of Miyako", it: "Isole vicine a Miyako", ru: "Ближайшие острова Мияко", ja: "宮古島周辺の島々" },
+      title: "宮古諸島",
       list: [
-        { id: "irrabu", nameEn: "Irabu", nameJa: "伊良部島", nameIt: "Irabu", nameRu: "Ирабу",
-          image: "https://upload.wikimedia.org/wikipedia/commons/f/fb/Irabu_Ohashi_Bridge.jpg",
-          descEn: "Connected by Irabu Bridge, stunning ocean views.", descJa: "伊良部大橋で接続、絶景。", descIt: "Collegato da Irabu Bridge.", descRu: "Соединён мостом Ирабу.",
-          accessEn: "Drive from Miyako.", accessJa: "宮古島から車で渡る。",
-          sightsEn: "Toguchi no Hama beach, Makiyama Observatory.", sightsJa: "渡口の浜、牧山展望台",
-          tipsEn: "Sunset drive amazing.", tipsJa: "ドライブ最高。",
-          official: "#" },
-        { id: "shimoji", nameEn: "Shimoji", nameJa: "下地島", nameIt: "Shimoji", nameRu: "Симодзи",
-          image: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Shimoji_Island_airport.jpg",
-          descEn: "Clear waters, aircraft spotting.", descJa: "透明度抜群、飛行機展望。", descIt: "Acque cristalline, aerei.", descRu: "Прозрачная вода, самолёты.",
-          accessEn: "Bridge from Irabu.", accessJa: "伊良部島経由。",
-          sightsEn: "Toriike Pond, Subarine Bridge.", sightsJa: "通り池、サバリン橋",
-          tipsEn: "Snorkeling gear needed.", tipsJa: "シュノーケル用意。",
-          official: "#" },
-        { id: "ikema", nameEn: "Ikema", nameJa: "池間島", nameIt: "Ikema", nameRu: "Икэма",
-          image: "https://upload.wikimedia.org/wikipedia/commons/8/87/Ikema_Island_Ohashi.jpg",
-          descEn: "Pastoral landscape, excellent stargazing.", descJa: "牧歌的風景、星空観測。", descIt: "Paesaggio pastorale, stelle.", descRu: "Пасторальный пейзаж.",
-          accessEn: "Ikema-Ohashi bridge.", accessJa: "池間大橋で渡る。",
-          sightsEn: "Ikema Beach, Mt. Akatsuka.", sightsJa: "池間ビーチ、赤塚山",
-          tipsEn: "Great for e-bike.", tipsJa: "電動自転車で探検。",
-          official: "#" },
-        { id: "kurima", nameEn: "Kurima", nameJa: "来間島", nameIt: "Kurima", nameRu: "Курима",
-          image: "https://upload.wikimedia.org/wikipedia/commons/6/6a/Kurima_Bridge.jpg",
-          descEn: "Small island with panoramic views.", descJa: "パノラマ展望の小島。", descIt: "Piccola isola panoramica.", descRu: "Маленький остров с видами.",
-          accessEn: "Kurima Bridge (from Miyako).", accessJa: "来間大橋。",
-          sightsEn: "Kurima Beach, Nanseikan observatory.", sightsJa: "来間ビーチ、南西観測所",
-          tipsEn: "Walking possible.", tipsJa: "徒歩でも楽しめる。",
-          official: "#" }
+        { name: "伊良部島", desc: "伊良部大橋、絶景。", img: "https://upload.wikimedia.org/wikipedia/commons/f/fb/Irabu_Ohashi_Bridge.jpg" },
+        { name: "下地島", desc: "透明度抜群、飛行機展望。", img: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Shimoji_Island_airport.jpg" },
+        { name: "池間島", desc: "牧歌的風景、星空観測。", img: "https://upload.wikimedia.org/wikipedia/commons/8/87/Ikema_Island_Ohashi.jpg" },
+        { name: "来間島", desc: "パノラマ展望の小島。", img: "https://upload.wikimedia.org/wikipedia/commons/6/6a/Kurima_Bridge.jpg" }
       ]
     }
   };
 
-  // 現在の画面状態
-  let currentView = "main";
-  let currentGroup = null;
-  let currentDetailId = null;
-
-  function getName(obj, fallback) { return obj[lang] || obj.en || fallback; }
-
-  // ★ 周辺島用のテキスト取得ヘルパー
-  function getNearbyText(item, field) {
-    if (!item) return "";
-    const fieldMap = {
-      desc: { en: item.descEn, ja: item.descJa, it: item.descIt, ru: item.descRu },
-      access: { en: item.accessEn, ja: item.accessJa, it: item.accessEn, ru: item.accessEn },
-      sights: { en: item.sightsEn, ja: item.sightsJa, it: item.sightsEn, ru: item.sightsEn },
-      tips: { en: item.tipsEn, ja: item.tipsJa, it: item.tipsEn, ru: item.tipsEn }
-    };
-    const target = fieldMap[field];
-    if (!target) return "";
-    return target[lang] || target.en || "";
-  }
-
-  function updateSponsors() {
-    const hasSponsor = SPONSOR_IMG_URL && SPONSOR_IMG_URL.trim() !== "" && SPONSOR_LINK_URL && SPONSOR_LINK_URL.trim() !== "";
-    const content = hasSponsor 
-      ? `<img src="${SPONSOR_IMG_URL}" alt="sponsor" style="max-height:80px; max-width:100%; border-radius:12px;"><br><a href="${SPONSOR_LINK_URL}" target="_blank" rel="noopener">${SPONSOR_LINK_URL}</a>`
-      : t("sponsorDefault");
-    document.getElementById("sponsorTop").innerHTML = content;
-    document.getElementById("sponsorBottom").innerHTML = content;
-  }
-
-  // メインページ
-  function renderMain() {
-    const app = document.getElementById("app");
-    app.innerHTML = `
-      <h2>${t("mainTitle")}</h2>
-      <div class="card-grid">
-        <div class="card" data-id="ishigaki">
-          <h3>${getName(mainIslands.ishigaki.name)}</h3>
-          <img class="card-img" src="${mainIslands.ishigaki.image}" onerror="this.src='https://placehold.co/600x300?text=Ishigaki'">
-          <p>${getName(mainIslands.ishigaki.desc)}</p>
-          <div class="map">
-            ${ISHIGAKI_MAP_URL ? `<img class="map-img" src="${ISHIGAKI_MAP_URL}" alt="Ishigaki Map" onerror="this.src='https://placehold.co/600x200?text=Map+load+error'">` : `<div class="map-placeholder">${t("noMap")}</div>`}
-          </div>
-          <a href="${mainIslands.ishigaki.official}" target="_blank" style="display:inline-block; background:#2c6e9e; color:white; padding:6px 12px; border-radius:40px; text-decoration:none; margin-top:8px;">${t("official")}</a>
-          <button class="detail-btn" style="margin-top:12px; width:100%;">${t("details")}</button>
-        </div>
-        <div class="card" data-id="miyako">
-          <h3>${getName(mainIslands.miyako.name)}</h3>
-          <img class="card-img" src="${mainIslands.miyako.image}" onerror="this.src='https://placehold.co/600x300?text=Miyako'">
-          <p>${getName(mainIslands.miyako.desc)}</p>
-          <div class="map">
-            ${MIYAKO_MAP_URL ? `<img class="map-img" src="${MIYAKO_MAP_URL}" alt="Miyako Map" onerror="this.src='https://placehold.co/600x200?text=Map+load+error'">` : `<div class="map-placeholder">${t("noMap")}</div>`}
-          </div>
-          <a href="${mainIslands.miyako.official}" target="_blank" style="display:inline-block; background:#2c6e9e; color:white; padding:6px 12px; border-radius:40px; text-decoration:none; margin-top:8px;">${t("official")}</a>
-          <button class="detail-btn" style="margin-top:12px; width:100%;">${t("details")}</button>
-        </div>
-      </div>
-      <hr>
-      <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin:20px 0;">
-        <button id="gotoYaeyama">${t("nearbyYaeyama")}</button>
-        <button id="gotoMiyako">${t("nearbyMiyako")}</button>
-      </div>
-    `;
-    document.querySelectorAll(".card").forEach(card => {
-      const id = card.dataset.id;
-      card.addEventListener("click", (e) => {
-        if (e.target.tagName === 'A' || e.target.classList.contains('detail-btn')) return;
-        currentDetailId = id;
-        currentView = "detail";
-        render();
-      });
-      card.querySelector(".detail-btn")?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        currentDetailId = id;
-        currentView = "detail";
-        render();
-      });
+  function showNearby(group) {
+    const data = nearbyData[group];
+    if (!data) return;
+    let html = `<div class="card"><button onclick="hideNearby()">戻る</button><h2>${data.title}</h2>`;
+    data.list.forEach(item => {
+      html += `<div style="border-bottom:1px solid #ccc; padding:10px;">
+                  <h3>${item.name}</h3>
+                  <img src="${item.img}" style="max-height:150px">
+                  <p>${item.desc}</p>
+                </div>`;
     });
-    document.getElementById("gotoYaeyama")?.addEventListener("click", () => { currentGroup = "yaeyama"; currentView = "group"; render(); });
-    document.getElementById("gotoMiyako")?.addEventListener("click", () => { currentGroup = "miyako"; currentView = "group"; render(); });
+    html += `</div>`;
+    document.getElementById("nearbyArea").innerHTML = html;
+    document.getElementById("nearbyArea").style.display = "block";
+    document.getElementById("detailArea").style.display = "none";
+    document.querySelector(".card-grid")?.remove();
   }
 
-  // 周辺島グループ
-  function renderGroup() {
-    const group = nearbyGroups[currentGroup];
-    if (!group) { currentView = "main"; render(); return; }
-    const app = document.getElementById("app");
-    app.innerHTML = `
-      <button class="back-btn" id="backToMain">← ${t("back")}</button>
-      <h2 style="text-align:center">${getName(group.name)}</h2>
-      <div class="island-list">
-        ${group.list.map(sub => `<div class="list-item" data-id="${sub.id}">${getName({ en: sub.nameEn, ja: sub.nameJa, it: sub.nameIt, ru: sub.nameRu }, sub.id)}</div>`).join('')}
-      </div>
-    `;
-    document.getElementById("backToMain")?.addEventListener("click", () => { currentView = "main"; render(); });
-    document.querySelectorAll(".list-item").forEach(el => {
-      el.addEventListener("click", () => {
-        const subId = el.dataset.id;
-        const found = [...nearbyGroups.yaeyama.list, ...nearbyGroups.miyako.list].find(i => i.id === subId);
-        if (found) {
-          window.tempDetail = found;
-          currentDetailId = subId;
-          currentView = "detail";
-          render();
-        }
-      });
-    });
+  function hideNearby() {
+    document.getElementById("nearbyArea").style.display = "none";
   }
 
-  // 詳細ページ（メイン島・周辺島共通）
-  function renderDetail() {
-    let data;
-    let isMain = false;
-    if (currentDetailId === "ishigaki") { data = mainIslands.ishigaki; isMain = true; }
-    else if (currentDetailId === "miyako") { data = mainIslands.miyako; isMain = true; }
-    else { data = window.tempDetail; isMain = false; }
-    if (!data) { currentView = "main"; render(); return; }
-
-    let name = "";
-    let desc = "";
-    let access = "";
-    let sights = "";
-    let tips = "";
-    let official = "";
-    let image = "";
-
-    if (isMain) {
-      name = getName(data.name);
-      desc = getName(data.desc);
-      access = getName(data.access);
-      sights = getName(data.sights);
-      tips = getName(data.tips);
-      official = data.official;
-      image = data.image;
-    } else {
-      name = getName({ en: data.nameEn, ja: data.nameJa, it: data.nameIt, ru: data.nameRu }, data.id);
-      desc = getNearbyText(data, "desc");
-      access = getNearbyText(data, "access");
-      sights = getNearbyText(data, "sights");
-      tips = getNearbyText(data, "tips");
-      official = data.official || "#";
-      image = data.image;
+  function showDetail(area) {
+    let html = "";
+    if (area === "ishigaki") {
+      html = `<div class="card"><button onclick="hideDetail()">戻る</button>
+              <h2>石垣島 詳細</h2>
+              <img src="${MY_URLS.ishigakiMainImg}">
+              <p>川平湾、野底岳、やいま村など。レンタカーが便利。</p>
+              <a href="${MY_URLS.ishigakiOfficial}" target="_blank">公式サイト</a>
+              </div>`;
+    } else if (area === "miyako") {
+      html = `<div class="card"><button onclick="hideDetail()">戻る</button>
+              <h2>宮古島 詳細</h2>
+              <img src="${MY_URLS.miyakoMainImg}">
+              <p>与那覇前浜ビーチ、東平安名崎。シュノーケリングにおすすめ。</p>
+              <a href="${MY_URLS.miyakoOfficial}" target="_blank">公式サイト</a>
+              </div>`;
     }
-
-    const app = document.getElementById("app");
-    app.innerHTML = `
-      <div class="detail-view">
-        <button class="back-btn" id="detailBack">← ${t("back")}</button>
-        <h2>${name}</h2>
-        <img class="detail-img" src="${image}" onerror="this.src='https://placehold.co/600x300'">
-        <p><strong>📖 Description:</strong> ${desc}</p>
-        ${access ? `<p><strong>🚢 Access:</strong> ${access}</p>` : ''}
-        ${sights ? `<p><strong>🏖️ Sights:</strong> ${sights}</p>` : ''}
-        ${tips ? `<p><strong>💡 Tips:</strong> ${tips}</p>` : ''}
-        <p><strong>🔗 Official:</strong> <a href="${official}" target="_blank">${official}</a></p>
-        <button class="back-btn" id="detailBack2">← ${t("back")}</button>
-      </div>
-    `;
-    const goBack = () => { currentView = "main"; render(); };
-    document.getElementById("detailBack")?.addEventListener("click", goBack);
-    document.getElementById("detailBack2")?.addEventListener("click", goBack);
+    document.getElementById("detailArea").innerHTML = html;
+    document.getElementById("detailArea").style.display = "block";
+    document.getElementById("nearbyArea").style.display = "none";
   }
 
-  function render() {
-    updateSponsors();
-    document.getElementById("mainTitle").innerText = t("title");
-    if (currentView === "main") renderMain();
-    else if (currentView === "group") renderGroup();
-    else if (currentView === "detail") renderDetail();
+  function hideDetail() {
+    document.getElementById("detailArea").style.display = "none";
   }
-
-  // 言語切り替え
-  function setLang(l) { lang = l; render(); }
-  document.getElementById("langEn")?.addEventListener("click", () => setLang("en"));
-  document.getElementById("langIt")?.addEventListener("click", () => setLang("it"));
-  document.getElementById("langRu")?.addEventListener("click", () => setLang("ru"));
-  document.getElementById("langJa")?.addEventListener("click", () => setLang("ja"));
-
-  // テーマ切り替え
-  const body = document.body;
-  if (localStorage.getItem("theme") === "light") { body.classList.remove("dark"); body.classList.add("light"); }
-  else body.classList.add("dark");
-  document.getElementById("themeBtn")?.addEventListener("click", () => {
-    if (body.classList.contains("dark")) {
-      body.classList.remove("dark"); body.classList.add("light");
-      localStorage.setItem("theme", "light");
-    } else {
-      body.classList.remove("light"); body.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
-  });
-
-  // PWA インストール
-  let deferredPrompt;
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const btn = document.createElement("button");
-    btn.textContent = "📲 Install App";
-    btn.style.cssText = "background:#2c6e9e; color:white; border:none; padding:6px 12px; border-radius:40px; margin-left:10px; cursor:pointer;";
-    btn.onclick = async () => {
-      btn.remove();
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-      }
-    };
-    const toolbar = document.querySelector(".toolbar");
-    if (toolbar) toolbar.appendChild(btn);
-  });
-
-  // Service Worker
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").then(reg => console.log("SW registered", reg)).catch(err => console.log("SW failed", err));
-    });
-  }
-
-  render();
 </script>
 </body>
 </html>
